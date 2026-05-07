@@ -1,0 +1,19 @@
+[
+  {
+    "id": 1,
+    "username": "Sainedecrime",
+    "solde": 15000,
+    "cardsCount": 5
+  },
+  {
+    "id": 2,
+    "username": "ScoutMaster",
+    "solde": 12000,
+    "cardsCount": 3
+  },
+  {
+    "username": "Joueur_Test",
+    "solde": 5000,
+    "cardsCount": 2
+  }
+]

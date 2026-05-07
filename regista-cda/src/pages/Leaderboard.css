@@ -1,0 +1,61 @@
+.leaderboard-page {
+  min-height: 100vh;
+  background: radial-gradient(circle, #1a1a1a 0%, #0d0d0d 100%);
+  color: white;
+}
+
+.leaderboard-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.title-gold {
+  color: #d4af37;
+  font-size: 2.5rem;
+  text-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+  margin-bottom: 10px;
+}
+
+.table-container {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.leaderboard-table th {
+  padding: 15px;
+  color: #00ffcc;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  border-bottom: 2px solid #333;
+}
+
+.leaderboard-table td {
+  padding: 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 1.1rem;
+}
+
+/* Couleurs Spéciales Podium */
+.rank-1 { background: rgba(212, 175, 55, 0.1); font-weight: bold; }
+.rank-2 { background: rgba(192, 192, 192, 0.05); }
+.rank-3 { background: rgba(205, 127, 50, 0.05); }
+
+.player-name { color: #fff; }
+.player-solde { color: #00ffcc; font-weight: bold; }
+
+.badge-cards {
+  background: #333;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}

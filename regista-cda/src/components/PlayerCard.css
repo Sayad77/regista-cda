@@ -1,0 +1,123 @@
+/* LE CONTENEUR 3D */
+.player-card-container {
+  perspective: 1000px; /* Donne l'effet de profondeur 3D */
+  width: 240px;
+  height: 350px;
+  cursor: pointer;
+  z-index: 1;
+  transition: transform 0.3s;
+}
+
+.player-card-container:hover {
+  transform: translateY(-8px) scale(1.03);
+  z-index: 10;
+}
+
+/* LA CARTE QUI TOURNE */
+.player-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Effet rebond */
+  transform-style: preserve-3d;
+}
+
+/* DECLENCHEUR DE ROTATION */
+.player-card-container.is-flipped .player-card-inner {
+  transform: rotateY(180deg);
+}
+
+/* LES DEUX FACES */
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden; /* Cache le dos de la face */
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 15px;
+  background: #0a0a0a;
+  border: 2px solid transparent;
+}
+
+/* LA FACE ARRIÈRE */
+.card-back {
+  transform: rotateY(180deg);
+  background: linear-gradient(180deg, #111 0%, #000 100%);
+  color: white;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-y: auto; /* Permet de scroller si trop de coupes */
+}
+
+.card-back::-webkit-scrollbar { width: 4px; }
+.card-back::-webkit-scrollbar-thumb { background: #00ffcc; border-radius: 4px; }
+
+/* =========================================
+   EFFETS NÉON (Appliqués aux deux faces)
+========================================= */
+.legendaire .card-front, .legendaire .card-back {
+  border-color: #ffda44;
+  box-shadow: 0 0 25px rgba(255, 218, 68, 0.5), inset 0 0 15px rgba(255, 218, 68, 0.2);
+}
+.epique .card-front, .epique .card-back {
+  border-color: #bc13fe;
+  box-shadow: 0 0 25px rgba(188, 19, 254, 0.5), inset 0 0 15px rgba(188, 19, 254, 0.2);
+}
+.standard .card-front, .standard .card-back {
+  border-color: #00ffcc;
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.4), inset 0 0 10px rgba(0, 255, 204, 0.1);
+}
+
+/* --- STYLES INTERNES (Front) --- */
+.card-header { display: flex; justify-content: space-between; align-items: center; width: 100%; z-index: 2; }
+.card-flag { font-size: 1.8rem; filter: drop-shadow(0 2px 5px rgba(0,0,0,1)); }
+.rarity-badge { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; padding: 5px 12px; border-radius: 20px; letter-spacing: 1px; }
+.legendaire .rarity-badge { background: #ffda44; color: #000; box-shadow: 0 0 10px #ffda44; }
+.epique .rarity-badge { background: #bc13fe; color: #fff; box-shadow: 0 0 10px #bc13fe; }
+.standard .rarity-badge { background: #00ffcc; color: #000; box-shadow: 0 0 10px #00ffcc; }
+
+.player-initial-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12rem; font-weight: 900; color: rgba(255, 255, 255, 0.04); z-index: 0; pointer-events: none; }
+.player-info { z-index: 2; width: 100%; }
+.player-name { color: #fff; font-size: 1.3rem; margin: 5px 0; text-shadow: 0 2px 4px rgba(0,0,0,1); }
+.player-club { font-size: 0.8rem; color: #ddd; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+.player-trophies { display: flex; justify-content: center; gap: 8px; margin: 10px 0; font-size: 0.9rem; background: rgba(0, 0, 0, 0.5); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); }
+.player-price { color: #00ffcc; font-weight: bold; font-size: 1.1rem; margin-top: 10px; }
+
+/* --- STYLES INTERNES (Back) --- */
+.back-title { font-size: 1.1rem; color: #fff; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px; width: 100%; text-align: left; }
+.palmares-section { width: 100%; text-align: left; margin-bottom: 12px; }
+.palmares-title { font-size: 0.85rem; color: #888; text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
+.palmares-years { font-size: 0.9rem; color: #00ffcc; font-family: monospace; }
+.no-data { font-size: 0.8rem; color: #666; font-style: italic; margin-top: 20px; }
+
+/* BOUTONS */
+.card-footer { width: 100%; z-index: 2; margin-top: auto; }
+.btn-buy, .btn-owned { width: 100%; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+.btn-buy { background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); }
+.btn-buy:hover { background: #fff; color: #000; transform: scale(1.05); }
+.btn-owned { background: #222; color: #666; cursor: not-allowed; }
+.flip-hint { font-size: 0.7rem; color: #666; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; }
+
+/* BOUTON DE REVENTE (BURN) */
+.btn-sell {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(255, 50, 50, 0.15);
+  color: #ff4444;
+  border: 1px solid rgba(255, 50, 50, 0.4);
+}
+
+.btn-sell:hover {
+  background: #ff4444;
+  color: #fff;
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(255, 50, 50, 0.5);
+}

@@ -1,0 +1,229 @@
+.gameboard-container {
+  background: #111;
+  border: 1px solid #00ffcc;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto 3rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
+}
+
+.game-hud h3 {
+  color: #00ffcc;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.clues-panel {
+  background: #0a0a0a;
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-left: 3px solid #bc13fe;
+}
+
+.clue-item { color: #fff; font-size: 0.95rem; }
+.btn-clue {
+  background: rgba(188, 19, 254, 0.2);
+  color: #bc13fe;
+  border: 1px solid #bc13fe;
+  padding: 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  align-self: flex-start;
+}
+.btn-clue:hover { background: #bc13fe; color: #fff; }
+
+/* LA GRILLE BOGGLE */
+.boggle-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  user-select: none;
+}
+
+.boggle-row {
+  display: flex;
+  gap: 5px;
+}
+
+.boggle-cell {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #222;
+  color: #888;
+  font-weight: bold;
+  font-size: 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.boggle-cell:hover { background: #333; color: #fff; }
+.boggle-cell.selected { background: #00ffcc; color: #000; transform: scale(1.1); box-shadow: 0 0 10px #00ffcc; }
+
+.boggle-grid.won .boggle-cell.selected { background: #ffda44; box-shadow: 0 0 15px #ffda44; }
+
+.current-word {
+  font-family: monospace;
+  font-size: 1.5rem;
+  color: #fff;
+  letter-spacing: 2px;
+  text-align: center;
+  min-height: 30px;
+}
+
+.victory-banner {
+  background: #00ffcc;
+  color: #000;
+  text-align: center;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 1.2rem;
+  border-radius: 5px;
+  animation: pulse 1s infinite;
+}
+
+.gameboard-footer { display: flex; flex-direction: column; gap: 15px; align-items: center; }
+.btn-giveup { background: transparent; color: #ff4444; border: 1px solid #ff4444; padding: 8px 20px; border-radius: 5px; cursor: pointer; }
+.btn-giveup:hover { background: #ff4444; color: #fff; }
+
+@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }/* --- NOUVELLES ZONES --- */
+.nouvelle-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.controls-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+}
+game-core-area
+.current-word {
+  font-family: monospace;
+  font-size: 1.8rem;
+  color: #fff;
+  letter-spacing: 3px;
+  text-align: center;
+  min-height: 40px;
+  background: #222;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  width: 80%;
+}
+
+.current-word.error-text {
+  color: #ff4444;
+  border-color: #ff4444;
+  animation: shake 0.4s;
+}
+
+.boggle-grid.error .boggle-cell.selected {
+  background: #ff4444;
+  box-shadow: 0 0 10px #ff4444;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 15px;
+  width: 80%;
+}
+
+.btn-action {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-undo {
+  background: #333;
+  color: #fff;
+}
+.btn-undo:hover:not(:disabled) {
+  background: #555;
+}
+
+.btn-submit {
+  background: #00ffcc;
+  color: #000;
+}
+.btn-submit:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px #00ffcc;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+/* --- CORRECTIONS DU CHAMP DE SAISIE --- */
+.controls-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  margin-top: 25px; /* FIX 1 : Descend le champ pour l'éloigner de la grille */
+}
+
+.input-display {
+  background: #000;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 15px;
+  font-size: 1.6rem;
+  letter-spacing: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 35px;
+  width: 80%;
+  color: #ffffff; /* FIX 2 : Le texte tapé sera bien blanc et visible */
+  font-weight: bold;
+  text-transform: uppercase;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+}
+
+.placeholder-text {
+  color: #444;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+}
+
+/* --- FIX 3 : ÉCLAIRAGE DES LETTRES SÉLECTIONNÉES --- */
+.boggle-cell.selected {
+  background: #00ffcc !important; /* Force la couleur néon */
+  color: #000 !important; /* Force le texte en noir pour la lisibilité */
+  transform: scale(1.15) !important; /* Grossit un peu la case */
+  box-shadow: 0 0 15px #00ffcc !important; /* Ajoute un halo lumineux */
+  border-color: #00ffcc !important;
+}

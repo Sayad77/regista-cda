@@ -1,0 +1,139 @@
+/* Fond global sombre et éco-conçu */
+body {
+  margin: 0;
+  background-color: #0a0a0a;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif; /* Plus lisible pour l'accessibilité */
+  overflow-x: hidden;
+}
+
+/* Container principal avec sémantique HTML5 */
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Titres de section clairs et contrastés (RGAA) */
+.section-title {
+  font-size: 1.8rem;
+  margin-top: 4rem;
+  border-bottom: 1px solid #333;
+  padding-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #00ffcc;
+}
+
+/* GRILLE RESPONSIVE 2026 */
+.cards-grid {
+  display: grid;
+  /* Mobile : 1 col | Tablette : 2 col | Bureau : 4+ col */
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 25px;
+  padding: 20px 0;
+}
+
+
+/* --- LE BADGE DE SYNCHRONISATION --- */
+.sync-indicator {
+  position: fixed; /* Il "flotte" au-dessus du reste */
+  bottom: 20px;
+  right: 20px; /* On le pousse à droite */
+  padding: 8px 15px;
+  background: rgba(0, 0, 0, 0.7); /* Fond noir semi-transparent */
+  border: 1px solid #00ffcc; /* Bordure cyan comme votre thème */
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: #00ffcc;
+  z-index: 9999; /* Toujours au premier plan */
+  pointer-events: none; /* Ne gêne pas les clics sur le reste du jeu */
+  transition: opacity 0.5s ease;
+}
+
+/* On le cache s'il n'y a rien à dire (statut 'idle') */
+.sync-indicator.idle {
+  opacity: 0;
+}
+
+/* Animation de pulsation quand ça charge */
+.sync-indicator.syncing {
+  border-color: #ff007f;
+  color: #ff007f;
+  animation: pulseSync 1.5s infinite;
+}
+
+@keyframes pulseSync {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* OPTIMISATION MOBILE (UX Design) */
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 1.4rem;
+    text-align: center;
+  }
+  
+  main {
+    padding: 1rem !important;
+  }
+
+  /* Loi de Fitts : Agrandir les zones de clic sur mobile */
+  .btn-buy, .btn-login {
+    min-height: 48px; 
+    font-size: 1.1rem;
+  }
+}
+/* --- BOUTON SCOUT GOLD (Proposition 2 validée) --- */
+.btn-scout-gold {
+  background: linear-gradient(45deg, #d4af37 0%, #f7dc6f 50%, #d4af37 100%);
+  color: #1a1a1a;
+  border: none;
+  padding: 16px 32px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  animation: pulseGold 2s infinite;
+  display: inline-block; /* Pour s'assurer que le padding/transform fonctionne bien */
+}
+
+.btn-scout-gold:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(212, 175, 55, 0.5);
+  animation: none;
+  filter: brightness(1.1); /* Petit flash de lumière au survol */
+}
+
+.btn-scout-gold:active {
+  transform: scale(0.98); /* Effet d'enfoncement quand on clique */
+}
+
+/* Accessibilité pour la navigation au clavier */
+.btn-scout-gold:focus-visible {
+  outline: 3px solid #00ffcc;
+  outline-offset: 4px;
+}
+
+@keyframes pulseGold {
+  0% { box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); }
+  50% { box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3); }
+  100% { box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); }
+}
+
+/* OPTIMISATION MOBILE */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 0 15px; /* On réduit un peu les marges sur petit écran */
+  }
+
+  .btn-scout-gold {
+    width: 100%; /* Le bouton prend toute la largeur sur mobile pour être plus facile à cliquer */
+    max-width: 300px;
+  }
+}
