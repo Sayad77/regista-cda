@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Navbar from '../components/Navbar';
 
+// Liste complète et préservée de tes 36 clubs
 const availableMissions = [
   { id: 'Arsenal', name: 'ARSENAL', difficulty: 'Difficile', color: '#ef0107' },
   { id: 'Bayern', name: 'BAYERN MÜNCHEN', difficulty: 'Difficile', color: '#dc052d' },
@@ -136,37 +137,80 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
     setErrorMsg(''); setVictoryData(null);
   };
 
+  // VUE 1 : UX DESIGN - Tri par difficulté et animations fluides
   if (!selectedTeam) {
+    const levels = {
+      'Facile': availableMissions.filter(m => m.difficulty === 'Facile'),
+      'Moyen': availableMissions.filter(m => m.difficulty === 'Moyen'),
+      'Difficile': availableMissions.filter(m => m.difficulty === 'Difficile'),
+      'Extrême': availableMissions.filter(m => m.difficulty === 'Extrême'),
+    };
+
     return (
       <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', fontFamily: 'sans-serif' }}>
         <Navbar />
-        <main style={{ padding: '3rem', textAlign: 'center' }}>
-          <h1 style={{ color: '#d4af37', marginBottom: '10px', fontSize: '2.5rem', textTransform: 'uppercase', letterSpacing: '2px' }}>
-            🌍 Bureau de Scoutisme
-          </h1>
-          <p style={{ color: '#888', marginBottom: '3rem', fontSize: '1.2rem' }}>
-            Sélectionnez un club pour infiltrer sa base de données et trouver ses légendes.
-          </p>
-          <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap', maxWidth: '1400px', margin: '0 auto' }}>
-            {availableMissions.map((mission) => (
-              <button 
-                key={mission.id} 
-                onClick={() => setSelectedTeam(mission.id)} 
-                aria-label={`Infiltrer ${mission.name}, Niveau ${mission.difficulty}`}
-                style={{ background: '#111', border: `2px solid ${mission.color}`, borderRadius: '12px', padding: '25px 15px', cursor: 'pointer', width: '200px', boxShadow: `0 4px 10px ${mission.color}30`, transition: 'all 0.2s', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }} 
-                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = `0 8px 20px ${mission.color}60`; }} 
-                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = `0 4px 10px ${mission.color}30`; }}
-              >
-                <h2 style={{ color: 'white', margin: '0 0 10px 0', fontSize: '1.1rem' }}>{mission.name}</h2>
-                <p style={{ color: mission.color, margin: 0, fontWeight: 'bold', fontSize: '0.9rem' }}>Niveau : {mission.difficulty}</p>
-              </button>
-            ))}
-          </div>
+        <main style={{ padding: '3rem', textAlign: 'center', maxWidth: '1200px', margin: '0 auto' }}>
+          <header>
+            <h1 style={{ color: '#d4af37', fontSize: '2.5rem', textTransform: 'uppercase', letterSpacing: '4px', marginBottom: '10px' }}>
+              RECRUTEMENT
+            </h1>
+            <p style={{ color: '#888', fontSize: '1.1rem', marginBottom: '3rem' }}>
+              Identifiez votre cible pour infiltrer le réseau.
+            </p>
+          </header>
+
+          {Object.entries(levels).map(([level, missions]) => (
+            missions.length > 0 && (
+              <section key={level} style={{ marginBottom: '40px' }}>
+                <h2 style={{ color: '#555', textAlign: 'left', fontSize: '0.9rem', borderBottom: '1px solid #222', paddingBottom: '10px', marginBottom: '20px', letterSpacing: '2px' }}>
+                  NIVEAU : {level.toUpperCase()}
+                </h2>
+                {/* Utilisation de Flexbox pour le responsive design */}
+                <div style={{ display: 'flex', gap: '15px', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
+                  {missions.map((mission) => (
+                    <button 
+                      key={mission.id} 
+                      onClick={() => setSelectedTeam(mission.id)} 
+                      aria-label={`Infiltrer ${mission.name}`}
+                      style={{ 
+                          background: '#111', 
+                          border: `1px solid ${mission.color}50`, 
+                          borderRadius: '8px', 
+                          padding: '20px', 
+                          cursor: 'pointer', 
+                          width: '180px', 
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', 
+                          display: 'flex', 
+                          flexDirection: 'column', 
+                          alignItems: 'center',
+                          position: 'relative',
+                          overflow: 'hidden'
+                      }} 
+                      onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'scale(1.05)';
+                          e.currentTarget.style.borderColor = mission.color;
+                          e.currentTarget.style.boxShadow = `0 0 15px ${mission.color}40`;
+                      }} 
+                      onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'scale(1)';
+                          e.currentTarget.style.borderColor = `${mission.color}50`;
+                          e.currentTarget.style.boxShadow = 'none';
+                      }}
+                    >
+                      <div style={{ width: '100%', height: '4px', background: mission.color, position: 'absolute', top: 0, left: 0 }}></div>
+                      <span style={{ color: 'white', fontWeight: 'bold', fontSize: '1rem', marginTop: '5px' }}>{mission.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )
+          ))}
         </main>
       </div>
     );
   }
 
+  // VUE 2 : Écran de victoire avec Drapeau HD
   if (victoryData) {
     const rankColors = { 'S': '#ffd700', 'A': '#00ffcc', 'B': '#3498db', 'C': '#555' };
     const rColor = rankColors[victoryData.rank];
@@ -204,7 +248,7 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
             </div>
 
             <p style={{ color: '#00ffcc', marginBottom: '30px', fontWeight: 'bold' }}>✅ La carte a été envoyée en sécurité dans votre Coffre-Fort.</p>
-            <button onClick={handleQuit} style={{ background: rColor, color: 'black', border: 'none', padding: '15px 30px', fontSize: '1.2rem', fontWeight: 'bold', borderRadius: '8px', cursor: 'pointer', width: '100%' }}>RETOURNER AU QG</button>
+            <button onClick={handleQuit} style={{ background: rColor, color: 'black', border: 'none', padding: '15px 30px', fontSize: '1.2rem', fontWeight: 'bold', borderRadius: '8px', cursor: 'pointer', width: '100%', transition: 'all 0.2s' }} onMouseEnter={(e) => e.target.style.transform = 'scale(1.02)'} onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}>RETOURNER AU QG</button>
           </div>
         </main>
       </div>
@@ -213,6 +257,7 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
 
   if (!gameData) return <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh' }}><Navbar /><div style={{ color: '#d4af37', textAlign: 'center', marginTop: '50px', fontSize: '1.5rem' }} aria-live="polite">📡 Infiltration des serveurs en cours...</div></div>;
 
+  // VUE 3 : Écran de jeu
   return (
     <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', fontFamily: 'sans-serif' }}>
       <Navbar />
@@ -245,7 +290,9 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
                 key={index} 
                 onClick={() => handleLetterClick(letter)} 
                 aria-label={`Lettre ${letter}`}
-                style={{ backgroundColor: '#000', border: '1px solid #333', borderRadius: '8px', aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '1.5rem', fontWeight: 'bold', fontFamily: 'serif', cursor: 'pointer', userSelect: 'none' }}
+                style={{ backgroundColor: '#000', border: '1px solid #333', borderRadius: '8px', aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '1.5rem', fontWeight: 'bold', fontFamily: 'serif', cursor: 'pointer', userSelect: 'none', transition: 'background 0.2s' }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#222'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#000'}
               >
                 {letter}
               </button>
@@ -262,7 +309,7 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
                 onChange={(e) => setInputValue(e.target.value)} 
                 style={{ flex: 1, backgroundColor: '#000', border: errorMsg ? '1px solid #ff4444' : '1px solid #333', borderRadius: '5px', color: 'white', padding: '15px', fontSize: '1.2rem', textTransform: 'uppercase', letterSpacing: '2px', transition: 'border 0.3s' }} 
               />
-              <button onClick={() => setInputValue('')} aria-label="Effacer" style={{ backgroundColor: '#7a1b1b', color: 'white', border: 'none', borderRadius: '5px', padding: '0 20px', cursor: 'pointer', fontWeight: 'bold' }}>⌫ EFFACER</button>
+              <button onClick={() => setInputValue('')} aria-label="Effacer" style={{ backgroundColor: '#7a1b1b', color: 'white', border: 'none', borderRadius: '5px', padding: '0 20px', cursor: 'pointer', fontWeight: 'bold', transition: 'background 0.2s' }} onMouseEnter={(e) => e.target.style.backgroundColor = '#a32222'} onMouseLeave={(e) => e.target.style.backgroundColor = '#7a1b1b'}>⌫ EFFACER</button>
             </div>
             
             <div aria-live="assertive">
@@ -270,13 +317,30 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
             </div>
           </div>
 
-          <button onClick={handleValider} style={{ width: '100%', backgroundColor: '#d4af37', color: 'black', border: 'none', borderRadius: '5px', padding: '15px', fontSize: '1.2rem', fontWeight: 'bold', cursor: 'pointer' }}>VALIDER LE NOM</button>
+          {/* UX DESIGN : Bouton plus incitatif si un texte est tapé */}
+          <button 
+            onClick={handleValider} 
+            style={{ 
+                width: '100%', 
+                backgroundColor: inputValue.length > 0 ? '#d4af37' : '#555', 
+                color: 'black', 
+                border: 'none', 
+                borderRadius: '5px', 
+                padding: '15px', 
+                fontSize: '1.2rem', 
+                fontWeight: 'bold', 
+                cursor: inputValue.length > 0 ? 'pointer' : 'default',
+                transition: 'all 0.3s'
+            }}
+          >
+            VALIDER LE NOM
+          </button>
         </div>
       </main>
     </div>
   );
 }
 
-const hintButtonStyle = { backgroundColor: 'transparent', border: '1px solid #d4af37', color: '#d4af37', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer', fontSize: '0.9rem' };
+const hintButtonStyle = { backgroundColor: 'transparent', border: '1px solid #d4af37', color: '#d4af37', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer', fontSize: '0.9rem', transition: 'all 0.2s' };
 
 export default Scoutisme;
