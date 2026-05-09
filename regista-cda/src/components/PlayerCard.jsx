@@ -7,13 +7,11 @@ function PlayerCard({ id, name, team, price, flag, stats, onBuy, onSell, isOwned
   const initial = name ? name.charAt(0) : '?';
   const club = team || 'Légende';
 
-  // Déduction de la rareté (pour ton CSS)
   let rarity = 'Standard';
   let rarityClass = 'standard';
   if (rank === 'S') { rarity = 'Légendaire'; rarityClass = 'legendaire'; }
   else if (rank === 'A') { rarity = 'Épique'; rarityClass = 'epique'; }
 
-  // Calcul du prix de revente
   let sellCoef = 0.5; 
   if (rank === 'S') sellCoef = 1.2; 
   else if (rank === 'A') sellCoef = 0.8; 
@@ -35,23 +33,36 @@ function PlayerCard({ id, name, team, price, flag, stats, onBuy, onSell, isOwned
     if (!isOwned && onBuy) onBuy(id);
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setIsFlipped(!isFlipped);
+    }
+  };
+
   return (
-    <div className={`player-card-container ${isFlipped ? 'is-flipped' : ''}`} onClick={() => setIsFlipped(!isFlipped)}>
+    <div 
+      className={`player-card-container ${isFlipped ? 'is-flipped' : ''}`} 
+      onClick={() => setIsFlipped(!isFlipped)}
+      role="button"
+      tabIndex="0"
+      aria-label={`Carte de ${name}, Rang ${rank}. Appuyez sur Entrée pour retourner la carte.`}
+      onKeyDown={handleKeyDown}
+    >
       <div className={`player-card-inner ${rarityClass}`}>
         
         {/* ================= FACE AVANT ================= */}
         <div className="card-front">
           <div className="card-header">
-            {/* GESTION DU DRAPEAU HD ICI */}
             {flag && flag !== '🌍' ? (
               <img 
                 src={`https://flagcdn.com/w40/${flag.toLowerCase()}.png`} 
-                alt="Nationalité" 
+                alt={`Drapeau ${name}`} 
                 className="card-flag"
                 style={{ width: '30px', borderRadius: '4px', boxShadow: '0 2px 5px rgba(0,0,0,0.5)' }} 
               />
             ) : (
-              <span className="card-flag" title="Nationalité">🌍</span>
+              <span className="card-flag" aria-hidden="true">🌍</span>
             )}
             
             {isOwned && rank && (
@@ -68,14 +79,14 @@ function PlayerCard({ id, name, team, price, flag, stats, onBuy, onSell, isOwned
 
           <div className="player-photo-container" style={{ width: '100%', height: '140px', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden', marginBottom: '10px' }}>
               <img 
-                src={`/players/${id}.png`} alt={name}
+                src={`/players/${id}.png`} alt={`Portrait ${name}`}
                 onError={(e) => {
                   e.target.style.display = 'none';
                   e.target.nextSibling.style.display = 'flex';
                 }}
                 style={{ height: '100%', objectFit: 'contain' }}
               />
-              <div style={{ display: 'none', fontSize: '4rem', fontWeight: 'bold', color: '#555', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
+              <div aria-hidden="true" style={{ display: 'none', fontSize: '4rem', fontWeight: 'bold', color: '#555', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
                 {initial}
               </div>
           </div>
@@ -84,7 +95,7 @@ function PlayerCard({ id, name, team, price, flag, stats, onBuy, onSell, isOwned
             <h3 className="player-name">{name}</h3>
             <div className="player-club">👕 {club}</div>
             
-            <div className="player-trophies">
+            <div className="player-trophies" aria-label="Trophées majeurs">
               {stats?.wc > 0 && <span title="Coupe du Monde">🏆 {stats.wc}</span>}
               {stats?.ucl > 0 && <span title="Ligue des Champions">🥇 {stats.ucl}</span>}
               {stats?.league > 0 && <span title="Championnat">🏅 {stats.league}</span>}
@@ -100,12 +111,12 @@ function PlayerCard({ id, name, team, price, flag, stats, onBuy, onSell, isOwned
                   REVENDRE (+{actualSellPrice.toLocaleString()} 🎫)
                 </button>
               ) : (
-                <div style={{ color: '#888', fontStyle: 'italic', padding: '10px 0' }}>En sécurité dans le coffre</div>
+                <div style={{ color: '#888', fontStyle: 'italic', padding: '10px 0' }}>En sécurité</div>
               )
             ) : (
               <button className="btn-buy" onClick={handleActionClick}>ACQUÉRIR</button>
             )}
-            <div className="flip-hint">↻ Cliquez pour infos</div>
+            <div className="flip-hint" aria-hidden="true">↻ Cliquez pour infos</div>
           </div>
         </div>
 
@@ -114,7 +125,7 @@ function PlayerCard({ id, name, team, price, flag, stats, onBuy, onSell, isOwned
           <h4 className="back-title">ARCHIVES : {name}</h4>
           
           {stats ? (
-            <>
+            <div aria-label="Détail du palmarès">
               <div className="palmares-section">
                 <div className="palmares-title">🏆 Coupe du Monde</div>
                 <div className="palmares-years">{stats.wc} victoire(s)</div>
@@ -131,13 +142,13 @@ function PlayerCard({ id, name, team, price, flag, stats, onBuy, onSell, isOwned
                 <div className="palmares-title">🏆 Coupes Nationales</div>
                 <div className="palmares-years">{stats.cup} victoire(s)</div>
               </div>
-            </>
+            </div>
           ) : (
             <div className="no-data">Données en cours de déclassification...</div>
           )}
 
           <div className="card-footer">
-             <div className="flip-hint">↻ Retour</div>
+             <div className="flip-hint" aria-hidden="true">↻ Retour</div>
           </div>
         </div>
 

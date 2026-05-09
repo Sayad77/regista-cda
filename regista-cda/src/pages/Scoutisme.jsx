@@ -91,7 +91,6 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
         setErrorMsg('');
       } else {
         let finalRank = 'C'; 
-        
         if (indicesReveles === 1 && secondsElapsed <= 60) finalRank = 'S'; 
         else if (indicesReveles <= 2 && secondsElapsed <= 120) finalRank = 'A'; 
         else if (indicesReveles <= 3 && secondsElapsed <= 180) finalRank = 'B'; 
@@ -100,7 +99,6 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
           const response = await fetch(`http://localhost:4000/api/cards/draw/${finalRank}`);
           const drawnCard = await response.json();
 
-          // ENVOI COMPLET AU COFFRE
           onWinCard(drawnCard.name, gameData.team, finalRank, drawnCard.base_value, drawnCard);
           
           setVictoryData({ 
@@ -112,7 +110,6 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
             time: formattedTime 
           });
         } catch (error) {
-          console.error(error);
           setErrorMsg("Erreur lors de la communication avec l'Agence.");
         }
       }
@@ -133,24 +130,17 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
   };
 
   const handleLetterClick = (letter) => setInputValue(prev => prev + letter);
-
   const handleQuit = () => {
-    setSelectedTeam(null);
-    setGameData(null);
-    setCurrentGridIndex(0);
-    setSecondsElapsed(0);
-    setInputValue('');
-    setIndicesReveles(1);
-    setErrorMsg('');
-    setVictoryData(null);
+    setSelectedTeam(null); setGameData(null); setCurrentGridIndex(0);
+    setSecondsElapsed(0); setInputValue(''); setIndicesReveles(1);
+    setErrorMsg(''); setVictoryData(null);
   };
-
 
   if (!selectedTeam) {
     return (
       <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', fontFamily: 'sans-serif' }}>
         <Navbar />
-        <div style={{ padding: '3rem', textAlign: 'center' }}>
+        <main style={{ padding: '3rem', textAlign: 'center' }}>
           <h1 style={{ color: '#d4af37', marginBottom: '10px', fontSize: '2.5rem', textTransform: 'uppercase', letterSpacing: '2px' }}>
             🌍 Bureau de Scoutisme
           </h1>
@@ -159,13 +149,20 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
           </p>
           <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap', maxWidth: '1400px', margin: '0 auto' }}>
             {availableMissions.map((mission) => (
-              <div key={mission.id} onClick={() => setSelectedTeam(mission.id)} style={{ background: '#111', border: `2px solid ${mission.color}`, borderRadius: '12px', padding: '25px 15px', cursor: 'pointer', width: '200px', boxShadow: `0 4px 10px ${mission.color}30`, transition: 'all 0.2s', display: 'flex', flexDirection: 'column', justifyContent: 'center' }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = `0 8px 20px ${mission.color}60`; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = `0 4px 10px ${mission.color}30`; }}>
+              <button 
+                key={mission.id} 
+                onClick={() => setSelectedTeam(mission.id)} 
+                aria-label={`Infiltrer ${mission.name}, Niveau ${mission.difficulty}`}
+                style={{ background: '#111', border: `2px solid ${mission.color}`, borderRadius: '12px', padding: '25px 15px', cursor: 'pointer', width: '200px', boxShadow: `0 4px 10px ${mission.color}30`, transition: 'all 0.2s', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }} 
+                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = `0 8px 20px ${mission.color}60`; }} 
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = `0 4px 10px ${mission.color}30`; }}
+              >
                 <h2 style={{ color: 'white', margin: '0 0 10px 0', fontSize: '1.1rem' }}>{mission.name}</h2>
                 <p style={{ color: mission.color, margin: 0, fontWeight: 'bold', fontSize: '0.9rem' }}>Niveau : {mission.difficulty}</p>
-              </div>
+              </button>
             ))}
           </div>
-        </div>
+        </main>
       </div>
     );
   }
@@ -177,7 +174,7 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
     return (
       <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', fontFamily: 'sans-serif' }}>
         <Navbar />
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+        <main role="alert" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
           <div style={{ background: '#111', border: `3px solid ${rColor}`, borderRadius: '15px', padding: '40px', textAlign: 'center', maxWidth: '500px', boxShadow: `0 0 50px ${rColor}40` }}>
             <h1 style={{ color: 'white', fontSize: '2.5rem', marginBottom: '10px' }}>🎉 MISSION ACCOMPLIE</h1>
             <p style={{ color: '#aaa', fontSize: '1.2rem', marginBottom: '30px' }}>
@@ -186,17 +183,14 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
 
             <div style={{ background: '#0a0a0a', border: '1px solid #333', padding: '20px', borderRadius: '10px', marginBottom: '30px' }}>
               <p style={{ margin: '0 0 10px 0', color: '#888' }}>Récompense Légendaire Débloquée :</p>
-              
-              {/* === DRAPEAU HD SUR L'ÉCRAN DE VICTOIRE === */}
               <h2 style={{ margin: '0 0 5px 0', color: 'white', fontSize: '2rem', letterSpacing: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
                 {victoryData.flag && victoryData.flag !== '🌍' ? (
                   <img src={`https://flagcdn.com/w40/${victoryData.flag.toLowerCase()}.png`} alt="Drapeau" style={{ height: '28px', borderRadius: '4px' }} />
                 ) : (
-                  <span>🌍</span>
+                  <span aria-hidden="true">🌍</span>
                 )}
                 {victoryData.player}
               </h2>
-
               <p style={{ color: '#bbb', fontStyle: 'italic', marginBottom: '15px' }}>"{victoryData.description}"</p>
               
               <div style={{ display: 'inline-block', borderBottom: `4px solid ${rColor}`, paddingBottom: '5px', marginRight: '15px' }}>
@@ -212,24 +206,24 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
             <p style={{ color: '#00ffcc', marginBottom: '30px', fontWeight: 'bold' }}>✅ La carte a été envoyée en sécurité dans votre Coffre-Fort.</p>
             <button onClick={handleQuit} style={{ background: rColor, color: 'black', border: 'none', padding: '15px 30px', fontSize: '1.2rem', fontWeight: 'bold', borderRadius: '8px', cursor: 'pointer', width: '100%' }}>RETOURNER AU QG</button>
           </div>
-        </div>
+        </main>
       </div>
     );
   }
 
-  if (!gameData) return <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh' }}><Navbar /><div style={{ color: '#d4af37', textAlign: 'center', marginTop: '50px', fontSize: '1.5rem' }}>📡 Infiltration des serveurs en cours...</div></div>;
+  if (!gameData) return <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh' }}><Navbar /><div style={{ color: '#d4af37', textAlign: 'center', marginTop: '50px', fontSize: '1.5rem' }} aria-live="polite">📡 Infiltration des serveurs en cours...</div></div>;
 
   return (
     <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', fontFamily: 'sans-serif' }}>
       <Navbar />
-      <div style={{ padding: '2rem', display: 'flex', justifyContent: 'center' }}>
+      <main style={{ padding: '2rem', display: 'flex', justifyContent: 'center' }}>
         <div style={{ backgroundColor: '#141414', border: '1px solid #333', borderRadius: '15px', width: '100%', maxWidth: '600px', padding: '30px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #333', paddingBottom: '15px', marginBottom: '20px' }}>
             <button onClick={handleQuit} style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', fontSize: '1rem', textDecoration: 'underline' }}>← Quitter</button>
             <h2 style={{ color: '#d4af37', margin: 0, fontSize: '1.2rem', letterSpacing: '1px' }}>MISSION : {gameData.team}</h2>
-            <div style={{ color: '#00D1B2', fontWeight: 'bold', display: 'flex', gap: '15px' }}>
-              <span>{solde} 🎫</span>
-              <span style={{ color: '#888' }}>{formattedTime}</span>
+            <div style={{ color: '#00D1B2', fontWeight: 'bold', display: 'flex', gap: '15px' }} aria-label="Infos mission">
+              <span aria-label={`Solde: ${solde}`}>{solde} 🎫</span>
+              <span aria-label={`Temps: ${formattedTime}`}>{formattedTime}</span>
             </div>
           </div>
 
@@ -245,23 +239,40 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${currentGrid.type}, 1fr)`, gap: '10px', maxWidth: `${currentGrid.type * 60}px`, margin: '30px auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${currentGrid.type}, 1fr)`, gap: '10px', maxWidth: `${currentGrid.type * 60}px`, margin: '30px auto' }} role="group" aria-label="Grille de lettres">
             {gridLetters.map((letter, index) => (
-              <div key={index} onClick={() => handleLetterClick(letter)} style={{ backgroundColor: '#000', border: '1px solid #333', borderRadius: '8px', aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '1.5rem', fontWeight: 'bold', fontFamily: 'serif', cursor: 'pointer', userSelect: 'none' }}>{letter}</div>
+              <button 
+                key={index} 
+                onClick={() => handleLetterClick(letter)} 
+                aria-label={`Lettre ${letter}`}
+                style={{ backgroundColor: '#000', border: '1px solid #333', borderRadius: '8px', aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '1.5rem', fontWeight: 'bold', fontFamily: 'serif', cursor: 'pointer', userSelect: 'none' }}
+              >
+                {letter}
+              </button>
             ))}
           </div>
 
           <div style={{ marginBottom: '15px' }}>
             <div style={{ display: 'flex', gap: '10px' }}>
-              <input type="text" placeholder="NOM DU JOUEUR" value={inputValue} onChange={(e) => setInputValue(e.target.value)} style={{ flex: 1, backgroundColor: '#000', border: errorMsg ? '1px solid #ff4444' : '1px solid #333', borderRadius: '5px', color: 'white', padding: '15px', fontSize: '1.2rem', textTransform: 'uppercase', letterSpacing: '2px', transition: 'border 0.3s' }} />
-              <button onClick={() => setInputValue('')} style={{ backgroundColor: '#7a1b1b', color: 'white', border: 'none', borderRadius: '5px', padding: '0 20px', cursor: 'pointer', fontWeight: 'bold' }}>⌫ EFFACER</button>
+              <input 
+                type="text" 
+                placeholder="NOM DU JOUEUR" 
+                aria-label="Nom du joueur"
+                value={inputValue} 
+                onChange={(e) => setInputValue(e.target.value)} 
+                style={{ flex: 1, backgroundColor: '#000', border: errorMsg ? '1px solid #ff4444' : '1px solid #333', borderRadius: '5px', color: 'white', padding: '15px', fontSize: '1.2rem', textTransform: 'uppercase', letterSpacing: '2px', transition: 'border 0.3s' }} 
+              />
+              <button onClick={() => setInputValue('')} aria-label="Effacer" style={{ backgroundColor: '#7a1b1b', color: 'white', border: 'none', borderRadius: '5px', padding: '0 20px', cursor: 'pointer', fontWeight: 'bold' }}>⌫ EFFACER</button>
             </div>
-            {errorMsg && <p style={{ color: '#ff4444', textAlign: 'center', marginTop: '10px', fontWeight: 'bold' }}>{errorMsg}</p>}
+            
+            <div aria-live="assertive">
+              {errorMsg && <p style={{ color: '#ff4444', textAlign: 'center', marginTop: '10px', fontWeight: 'bold' }}>{errorMsg}</p>}
+            </div>
           </div>
 
           <button onClick={handleValider} style={{ width: '100%', backgroundColor: '#d4af37', color: 'black', border: 'none', borderRadius: '5px', padding: '15px', fontSize: '1.2rem', fontWeight: 'bold', cursor: 'pointer' }}>VALIDER LE NOM</button>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
