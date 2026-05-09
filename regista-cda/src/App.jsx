@@ -12,7 +12,6 @@ import Home from './pages/Home'
 import Scoutisme from './pages/Scoutisme';
 
 function App() {
-  // --- ÉTATS AVEC SÉCURITÉ ANTI-CRASH ---
   const [solde, setSolde] = useState(() => {
     try {
       const saved = localStorage.getItem('regista_solde');
@@ -27,12 +26,9 @@ function App() {
     } catch (e) { return []; }
   });
 
-  const [marketPlayers, setMarketPlayers] = useState([]); 
   const [transactions, setTransactions] = useState([]); 
-  const [loading, setLoading] = useState(true);
   const [syncStatus, setSyncStatus] = useState('idle');
 
-  // --- FONCTION DE SAUVEGARDE (SORTIE DES AUTRES FONCTIONS) ---
   const saveProgressToServer = async (username, currentSolde, collection) => {
     setSyncStatus('syncing');
     try {
@@ -47,28 +43,9 @@ function App() {
       });
       setSyncStatus('success');
       setTimeout(() => setSyncStatus('idle'), 2000);
-    } catch (error) {
-      setSyncStatus('error');
-    }
+    } catch (error) { setSyncStatus('error'); }
   };
 
-  // --- CHARGEMENT INITIAL ---
-  useEffect(() => {
-    const fetchMarket = async () => {
-      try {
-        const response = await fetch('http://localhost:4000/api/market');
-        const data = await response.json();
-        setMarketPlayers(data);
-      } catch (error) {
-        console.error("Erreur serveur :", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchMarket();
-  }, []);
-
-  // --- SAUVEGARDE AUTOMATIQUE ---
   useEffect(() => {
     localStorage.setItem('regista_solde', JSON.stringify(solde));
     localStorage.setItem('regista_collection', JSON.stringify(myCollection));
@@ -76,7 +53,6 @@ function App() {
     saveProgressToServer(storedUser, solde, myCollection);
   }, [solde, myCollection]);
 
-  // --- LOGIQUE DE JEU ---
   const addTransaction = (motif, montant) => {
     const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
     setTransactions(prev => [{ time, motif, montant, type: montant > 0 ? 'REVENU' : 'DÉPENSE' }, ...prev]);
@@ -85,7 +61,7 @@ function App() {
   const handleSellPlayer = (playerId) => {
     const playerToSell = myCollection.find(p => p.id === playerId);
     if (playerToSell) {
-      const coefs = { 'S': 1.2, 'A': 0.8, 'B': 0.6, 'D': 0.2 };
+      const coefs = { 'S': 1.2, 'A': 0.8, 'B': 0.6, 'C': 0.4 };
       const sellPrice = Math.floor(playerToSell.price * (coefs[playerToSell.rank] || 0.5));
       setSolde(prev => prev + sellPrice);
       addTransaction(`Revente ${playerToSell.name}`, sellPrice);
@@ -95,17 +71,43 @@ function App() {
     return null;
   };
 
+  const handleBuyHint = (cost, motif) => {
+    if (solde >= cost) {
+      setSolde(prev => prev - cost);
+      addTransaction(motif, -cost); 
+      return true; 
+    }
+    return false; 
+  };
+
+  const handleWinCard = (playerName, teamName, achievedRank, basePrice, fullCardData) => {
+    const newCard = {
+      id: Date.now(), 
+      name: playerName,
+      team: teamName,
+      rank: achievedRank,
+      price: basePrice,
+      flag: fullCardData.flag,
+      stats: {
+        wc: fullCardData.wc_won,
+        ucl: fullCardData.ucl_won,
+        league: fullCardData.league_won,
+        cup: fullCardData.cup_won
+      }
+    };
+    setMyCollection(prev => [newCard, ...prev]);
+  };
+
   return (
     <>
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/home" element={<Home />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/agency" element={<Agency myCollection={myCollection} onSellPlayer={handleSellPlayer} />} />
         <Route path="/bank" element={<BankVault solde={solde} transactions={transactions} myCollection={myCollection} />} />
-        
-        {/* Ta nouvelle route propre pour le jeu */}
-        <Route path="/game" element={<Scoutisme />} />
+        <Route path="/game" element={<Scoutisme solde={solde} onBuyHint={handleBuyHint} onWinCard={handleWinCard} />} />
       </Routes>
 
       <div className={`sync-indicator ${syncStatus}`}>
