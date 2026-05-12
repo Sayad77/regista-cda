@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Pelé",
+    "cloudinary_url": "https://res.cloudinary.com/dxsjlclnv/image/upload/v1778359453/regista_players/pel%C3%A9.webp"
+  },
+  {
+    "name": "Diego Maradona",
+    "cloudinary_url": "https://res.cloudinary.com/dxsjlclnv/image/upload/v1778359458/regista_players/diego_maradona.webp"
+  },
+  {
+    "name": "Lionel Messi",
+    "cloudinary_url": "https://res.cloudinary.com/dxsjlclnv/image/upload/v1778359462/regista_players/lionel_messi.webp"
+  },
+  {
+    "name": "Cristiano Ronaldo",
+    "cloudinary_url": "https://res.cloudinary.com/dxsjlclnv/image/upload/v1778359467/regista_players/cristiano_ronaldo.webp"
+  },
+  {
+    "name": "Zinedine Zidane",
+    "cloudinary_url": "https://res.cloudinary.com/dxsjlclnv/image/upload/v1778359471/regista_players/zinedine_zidane.webp"
+  }
+]

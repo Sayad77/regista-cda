@@ -47,7 +47,12 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
   const [currentGridIndex, setCurrentGridIndex] = useState(0);
   const [indicesReveles, setIndicesReveles] = useState(1);
   const [inputValue, setInputValue] = useState('');
+  const [clickedIndexes, setClickedIndexes] = useState([]); 
   const [secondsElapsed, setSecondsElapsed] = useState(0);
+  const [hasSkipped, setHasSkipped] = useState(false); 
+
+  // 🪄 ÉTAT POUR LA MODAL SUR-MESURE
+  const [revealModal, setRevealModal] = useState({ isOpen: false, player: null });
 
   const [errorMsg, setErrorMsg] = useState(''); 
   const [victoryData, setVictoryData] = useState(null); 
@@ -62,10 +67,10 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
   }, [selectedTeam]);
 
   useEffect(() => {
-    if (!gameData || victoryData) return;
+    if (!gameData || victoryData || revealModal.isOpen) return; // Le temps s'arrête si la modal est ouverte !
     const interval = setInterval(() => setSecondsElapsed(prev => prev + 1), 1000);
     return () => clearInterval(interval);
-  }, [gameData, currentGridIndex, victoryData]);
+  }, [gameData, currentGridIndex, victoryData, revealModal.isOpen]);
 
   const formattedTime = `${Math.floor(secondsElapsed / 60).toString().padStart(2, '0')}:${(secondsElapsed % 60).toString().padStart(2, '0')}`;
 
@@ -88,11 +93,13 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
         setCurrentGridIndex(currentGridIndex + 1);
         setIndicesReveles(1);
         setInputValue('');
+        setClickedIndexes([]); 
         setSecondsElapsed(0); 
         setErrorMsg('');
       } else {
         let finalRank = 'C'; 
-        if (indicesReveles === 1 && secondsElapsed <= 60) finalRank = 'S'; 
+        if (hasSkipped) finalRank = 'D';
+        else if (indicesReveles === 1 && secondsElapsed <= 60) finalRank = 'S'; 
         else if (indicesReveles <= 2 && secondsElapsed <= 120) finalRank = 'A'; 
         else if (indicesReveles <= 3 && secondsElapsed <= 180) finalRank = 'B'; 
         
@@ -117,7 +124,46 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
     } else {
       setErrorMsg("❌ Nom incorrect. Fouillez encore les données !");
       setInputValue('');
+      setClickedIndexes([]); 
       setTimeout(() => setErrorMsg(''), 3000); 
+    }
+  };
+
+  // 🪄 1. FONCTION QUI OUVRE LA MODAL
+  const triggerReveal = () => {
+    setRevealModal({ isOpen: true, player: currentGrid.player });
+  };
+
+  // 🪄 2. FONCTION QUAND LE JOUEUR CLIQUE SUR "COMPRIS" DANS LA MODAL
+  const confirmReveal = async () => {
+    setRevealModal({ isOpen: false, player: null }); // On ferme la modal
+    
+    if (currentGridIndex < 2) {
+      setHasSkipped(true);
+      setCurrentGridIndex(currentGridIndex + 1);
+      setIndicesReveles(1);
+      setInputValue('');
+      setClickedIndexes([]); 
+      setSecondsElapsed(0); 
+      setErrorMsg('');
+    } else {
+      try {
+        const response = await fetch(`http://localhost:4000/api/cards/draw/D`);
+        const drawnCard = await response.json();
+
+        onWinCard(drawnCard.name, gameData.team, 'D', drawnCard.base_value, drawnCard);
+        
+        setVictoryData({ 
+          player: drawnCard.name, 
+          description: drawnCard.description,
+          value: drawnCard.base_value,
+          rank: 'D', 
+          flag: drawnCard.flag, 
+          time: formattedTime 
+        });
+      } catch (error) {
+        setErrorMsg("Erreur lors de la communication avec l'Agence.");
+      }
     }
   };
 
@@ -130,14 +176,24 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
     }
   };
 
-  const handleLetterClick = (letter) => setInputValue(prev => prev + letter);
+  const handleLetterClick = (letter, index) => {
+    if (clickedIndexes.includes(index)) return;
+    setInputValue(prev => prev + letter);
+    setClickedIndexes(prev => [...prev, index]);
+  };
+
+  const handleEffacer = () => {
+    setInputValue(prev => prev.slice(0, -1));
+    setClickedIndexes(prev => prev.slice(0, -1));
+  };
+
   const handleQuit = () => {
     setSelectedTeam(null); setGameData(null); setCurrentGridIndex(0);
     setSecondsElapsed(0); setInputValue(''); setIndicesReveles(1);
-    setErrorMsg(''); setVictoryData(null);
+    setClickedIndexes([]); setErrorMsg(''); setVictoryData(null); setHasSkipped(false); 
   };
 
-  // VUE 1 : UX DESIGN - Tri par difficulté et animations fluides
+  // VUE 1 : CHOIX DE LA MISSION
   if (!selectedTeam) {
     const levels = {
       'Facile': availableMissions.filter(m => m.difficulty === 'Facile'),
@@ -165,7 +221,6 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
                 <h2 style={{ color: '#555', textAlign: 'left', fontSize: '0.9rem', borderBottom: '1px solid #222', paddingBottom: '10px', marginBottom: '20px', letterSpacing: '2px' }}>
                   NIVEAU : {level.toUpperCase()}
                 </h2>
-                {/* Utilisation de Flexbox pour le responsive design */}
                 <div style={{ display: 'flex', gap: '15px', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
                   {missions.map((mission) => (
                     <button 
@@ -173,29 +228,12 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
                       onClick={() => setSelectedTeam(mission.id)} 
                       aria-label={`Infiltrer ${mission.name}`}
                       style={{ 
-                          background: '#111', 
-                          border: `1px solid ${mission.color}50`, 
-                          borderRadius: '8px', 
-                          padding: '20px', 
-                          cursor: 'pointer', 
-                          width: '180px', 
-                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', 
-                          display: 'flex', 
-                          flexDirection: 'column', 
-                          alignItems: 'center',
-                          position: 'relative',
-                          overflow: 'hidden'
+                          background: '#111', border: `1px solid ${mission.color}50`, borderRadius: '8px', 
+                          padding: '20px', cursor: 'pointer', width: '180px', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', 
+                          display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', overflow: 'hidden'
                       }} 
-                      onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = 'scale(1.05)';
-                          e.currentTarget.style.borderColor = mission.color;
-                          e.currentTarget.style.boxShadow = `0 0 15px ${mission.color}40`;
-                      }} 
-                      onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = 'scale(1)';
-                          e.currentTarget.style.borderColor = `${mission.color}50`;
-                          e.currentTarget.style.boxShadow = 'none';
-                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.borderColor = mission.color; e.currentTarget.style.boxShadow = `0 0 15px ${mission.color}40`; }} 
+                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.borderColor = `${mission.color}50`; e.currentTarget.style.boxShadow = 'none'; }}
                     >
                       <div style={{ width: '100%', height: '4px', background: mission.color, position: 'absolute', top: 0, left: 0 }}></div>
                       <span style={{ color: 'white', fontWeight: 'bold', fontSize: '1rem', marginTop: '5px' }}>{mission.name}</span>
@@ -210,29 +248,31 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
     );
   }
 
-  // VUE 2 : Écran de victoire avec Drapeau HD
+  // VUE 2 : VICTOIRE
   if (victoryData) {
-    const rankColors = { 'S': '#ffd700', 'A': '#00ffcc', 'B': '#3498db', 'C': '#555' };
-    const rColor = rankColors[victoryData.rank];
+    const rankColors = { 'S': '#ffd700', 'A': '#00ffcc', 'B': '#3498db', 'C': '#555', 'D': '#8b0000' };
+    const rColor = rankColors[victoryData.rank] || '#555';
 
     return (
       <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', fontFamily: 'sans-serif' }}>
         <Navbar />
         <main role="alert" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
           <div style={{ background: '#111', border: `3px solid ${rColor}`, borderRadius: '15px', padding: '40px', textAlign: 'center', maxWidth: '500px', boxShadow: `0 0 50px ${rColor}40` }}>
-            <h1 style={{ color: 'white', fontSize: '2.5rem', marginBottom: '10px' }}>🎉 MISSION ACCOMPLIE</h1>
+            <h1 style={{ color: 'white', fontSize: '2.5rem', marginBottom: '10px' }}>
+              {victoryData.rank === 'D' ? 'MISSION TERMINÉE' : '🎉 MISSION ACCOMPLIE'}
+            </h1>
             <p style={{ color: '#aaa', fontSize: '1.2rem', marginBottom: '30px' }}>
               Base de données du <strong style={{ color: 'white' }}>{gameData.team}</strong> hackée.
             </p>
 
             <div style={{ background: '#0a0a0a', border: '1px solid #333', padding: '20px', borderRadius: '10px', marginBottom: '30px' }}>
-              <p style={{ margin: '0 0 10px 0', color: '#888' }}>Récompense Légendaire Débloquée :</p>
+              <p style={{ margin: '0 0 10px 0', color: '#888' }}>
+                {victoryData.rank === 'D' ? 'Récompense de Consolation :' : 'Récompense Légendaire Débloquée :'}
+              </p>
               <h2 style={{ margin: '0 0 5px 0', color: 'white', fontSize: '2rem', letterSpacing: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
                 {victoryData.flag && victoryData.flag !== '🌍' ? (
                   <img src={`https://flagcdn.com/w40/${victoryData.flag.toLowerCase()}.png`} alt="Drapeau" style={{ height: '28px', borderRadius: '4px' }} />
-                ) : (
-                  <span aria-hidden="true">🌍</span>
-                )}
+                ) : ( <span aria-hidden="true">🌍</span> )}
                 {victoryData.player}
               </h2>
               <p style={{ color: '#bbb', fontStyle: 'italic', marginBottom: '15px' }}>"{victoryData.description}"</p>
@@ -248,7 +288,7 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
             </div>
 
             <p style={{ color: '#00ffcc', marginBottom: '30px', fontWeight: 'bold' }}>✅ La carte a été envoyée en sécurité dans votre Coffre-Fort.</p>
-            <button onClick={handleQuit} style={{ background: rColor, color: 'black', border: 'none', padding: '15px 30px', fontSize: '1.2rem', fontWeight: 'bold', borderRadius: '8px', cursor: 'pointer', width: '100%', transition: 'all 0.2s' }} onMouseEnter={(e) => e.target.style.transform = 'scale(1.02)'} onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}>RETOURNER AU QG</button>
+            <button onClick={handleQuit} style={{ background: rColor, color: victoryData.rank === 'D' ? 'white' : 'black', border: 'none', padding: '15px 30px', fontSize: '1.2rem', fontWeight: 'bold', borderRadius: '8px', cursor: 'pointer', width: '100%', transition: 'all 0.2s' }} onMouseEnter={(e) => e.target.style.transform = 'scale(1.02)'} onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}>RETOURNER AU QG</button>
           </div>
         </main>
       </div>
@@ -257,10 +297,57 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
 
   if (!gameData) return <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh' }}><Navbar /><div style={{ color: '#d4af37', textAlign: 'center', marginTop: '50px', fontSize: '1.5rem' }} aria-live="polite">📡 Infiltration des serveurs en cours...</div></div>;
 
-  // VUE 3 : Écran de jeu
+  // VUE 3 : JEU
   return (
     <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', fontFamily: 'sans-serif' }}>
       <Navbar />
+
+      {/* 🪄 LA NOUVELLE MODAL QUI S'AFFICHE PAR-DESSUS LE JEU */}
+      {revealModal.isOpen && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.85)', display: 'flex',
+          justifyContent: 'center', alignItems: 'center', zIndex: 1000,
+          backdropFilter: 'blur(5px)'
+        }}>
+          <div style={{
+            background: '#111', border: '2px solid #ff4444', borderRadius: '12px',
+            padding: '40px', maxWidth: '450px', width: '90%', textAlign: 'center',
+            boxShadow: '0 0 40px rgba(255, 68, 68, 0.3)'
+          }}>
+            <h3 style={{ color: '#ff4444', margin: '0 0 20px 0', fontSize: '1.8rem', letterSpacing: '2px' }}>
+              👁️ DOSSIER DÉCLASSIFIÉ
+            </h3>
+            
+            <p style={{ color: '#aaa', fontSize: '1.2rem', marginBottom: '10px' }}>
+              L'agent recherché était :
+            </p>
+            <strong style={{ color: 'white', fontSize: '2.5rem', display: 'block', marginBottom: '30px', letterSpacing: '3px' }}>
+              {revealModal.player}
+            </strong>
+            
+            <div style={{ background: 'rgba(255, 68, 68, 0.1)', borderLeft: '4px solid #ff4444', padding: '15px', borderRadius: '4px', marginBottom: '30px', textAlign: 'left' }}>
+              <p style={{ color: '#ffaaaa', margin: 0, fontSize: '0.95rem', lineHeight: '1.5' }}>
+                <strong>⚠️ Pénalité appliquée :</strong> Vous avez abandonné cette recherche. La récompense finale de cette mission sera plafonnée au Rang D.
+              </p>
+            </div>
+            
+            <button
+              onClick={confirmReveal}
+              style={{
+                background: '#ff4444', color: 'white', border: 'none', padding: '15px 40px',
+                borderRadius: '8px', fontSize: '1.2rem', fontWeight: 'bold', cursor: 'pointer',
+                transition: 'transform 0.2s', width: '100%'
+              }}
+              onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+              onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+            >
+              COMPRIS, CONTINUER
+            </button>
+          </div>
+        </div>
+      )}
+
       <main style={{ padding: '2rem', display: 'flex', justifyContent: 'center' }}>
         <div style={{ backgroundColor: '#141414', border: '1px solid #333', borderRadius: '15px', width: '100%', maxWidth: '600px', padding: '30px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #333', paddingBottom: '15px', marginBottom: '20px' }}>
@@ -285,56 +372,59 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: `repeat(${currentGrid.type}, 1fr)`, gap: '10px', maxWidth: `${currentGrid.type * 60}px`, margin: '30px auto' }} role="group" aria-label="Grille de lettres">
-            {gridLetters.map((letter, index) => (
-              <button 
-                key={index} 
-                onClick={() => handleLetterClick(letter)} 
-                aria-label={`Lettre ${letter}`}
-                style={{ backgroundColor: '#000', border: '1px solid #333', borderRadius: '8px', aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '1.5rem', fontWeight: 'bold', fontFamily: 'serif', cursor: 'pointer', userSelect: 'none', transition: 'background 0.2s' }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#222'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#000'}
-              >
-                {letter}
-              </button>
-            ))}
+            {gridLetters.map((letter, index) => {
+              const isClicked = clickedIndexes.includes(index); 
+              return (
+                <button 
+                  key={index} 
+                  onClick={() => handleLetterClick(letter, index)} 
+                  disabled={isClicked} 
+                  aria-label={`Lettre ${letter}`}
+                  style={{ 
+                    backgroundColor: isClicked ? '#d4af37' : '#000', 
+                    color: isClicked ? '#000' : 'white', 
+                    border: isClicked ? '1px solid #d4af37' : '1px solid #333', 
+                    borderRadius: '8px', aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                    fontSize: '1.5rem', fontWeight: 'bold', fontFamily: 'serif', cursor: isClicked ? 'default' : 'pointer', 
+                    userSelect: 'none', transform: isClicked ? 'scale(0.95)' : 'scale(1)', transition: 'all 0.2s' 
+                  }}
+                  onMouseEnter={(e) => { if(!isClicked) e.target.style.backgroundColor = '#222'; }}
+                  onMouseLeave={(e) => { if(!isClicked) e.target.style.backgroundColor = '#000'; }}
+                >
+                  {letter}
+                </button>
+              );
+            })}
           </div>
 
           <div style={{ marginBottom: '15px' }}>
             <div style={{ display: 'flex', gap: '10px' }}>
               <input 
-                type="text" 
-                placeholder="NOM DU JOUEUR" 
-                aria-label="Nom du joueur"
-                value={inputValue} 
-                onChange={(e) => setInputValue(e.target.value)} 
-                style={{ flex: 1, backgroundColor: '#000', border: errorMsg ? '1px solid #ff4444' : '1px solid #333', borderRadius: '5px', color: 'white', padding: '15px', fontSize: '1.2rem', textTransform: 'uppercase', letterSpacing: '2px', transition: 'border 0.3s' }} 
+                type="text" placeholder="NOM DU JOUEUR" readOnly value={inputValue} 
+                style={{ flex: 1, backgroundColor: '#000', border: errorMsg ? '1px solid #ff4444' : '1px solid #333', borderRadius: '5px', color: 'white', padding: '15px', fontSize: '1.2rem', textTransform: 'uppercase', letterSpacing: '2px', transition: 'border 0.3s', cursor: 'default' }} 
               />
-              <button onClick={() => setInputValue('')} aria-label="Effacer" style={{ backgroundColor: '#7a1b1b', color: 'white', border: 'none', borderRadius: '5px', padding: '0 20px', cursor: 'pointer', fontWeight: 'bold', transition: 'background 0.2s' }} onMouseEnter={(e) => e.target.style.backgroundColor = '#a32222'} onMouseLeave={(e) => e.target.style.backgroundColor = '#7a1b1b'}>⌫ EFFACER</button>
+              <button onClick={handleEffacer} aria-label="Effacer" style={{ backgroundColor: '#7a1b1b', color: 'white', border: 'none', borderRadius: '5px', padding: '0 20px', cursor: 'pointer', fontWeight: 'bold', transition: 'background 0.2s' }} onMouseEnter={(e) => e.target.style.backgroundColor = '#a32222'} onMouseLeave={(e) => e.target.style.backgroundColor = '#7a1b1b'}>⌫ EFFACER</button>
             </div>
-            
-            <div aria-live="assertive">
-              {errorMsg && <p style={{ color: '#ff4444', textAlign: 'center', marginTop: '10px', fontWeight: 'bold' }}>{errorMsg}</p>}
-            </div>
+            <div aria-live="assertive">{errorMsg && <p style={{ color: '#ff4444', textAlign: 'center', marginTop: '10px', fontWeight: 'bold' }}>{errorMsg}</p>}</div>
           </div>
 
-          {/* UX DESIGN : Bouton plus incitatif si un texte est tapé */}
           <button 
             onClick={handleValider} 
-            style={{ 
-                width: '100%', 
-                backgroundColor: inputValue.length > 0 ? '#d4af37' : '#555', 
-                color: 'black', 
-                border: 'none', 
-                borderRadius: '5px', 
-                padding: '15px', 
-                fontSize: '1.2rem', 
-                fontWeight: 'bold', 
-                cursor: inputValue.length > 0 ? 'pointer' : 'default',
-                transition: 'all 0.3s'
-            }}
+            style={{ width: '100%', backgroundColor: inputValue.length > 0 ? '#d4af37' : '#555', color: 'black', border: 'none', borderRadius: '5px', padding: '15px', fontSize: '1.2rem', fontWeight: 'bold', cursor: inputValue.length > 0 ? 'pointer' : 'default', transition: 'all 0.3s' }}
           >
             VALIDER LE NOM
           </button>
+
+          {/* BOUTON DÉCLENCHEUR DE LA MODAL */}
+          <button 
+            onClick={triggerReveal} 
+            style={{ width: '100%', backgroundColor: 'transparent', color: '#ff4444', border: '1px dashed #ff4444', borderRadius: '5px', padding: '10px', marginTop: '15px', fontSize: '0.9rem', cursor: 'pointer', transition: 'all 0.3s' }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(255, 68, 68, 0.1)'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+          >
+            👁️ RÉVÉLER LA RÉPONSE (Passer au Rang D)
+          </button>
+
         </div>
       </main>
     </div>

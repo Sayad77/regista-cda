@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import './PlayerCard.css';
+import DynamicJersey from './DynamicJersey'; // Importation du moteur
 
 function PlayerCard({ id, name, team, price, flag, stats, onBuy, onSell, isOwned, rank }) {
   const [isFlipped, setIsFlipped] = useState(false);
 
-  const initial = name ? name.charAt(0) : '?';
   const club = team || 'Légende';
 
   let rarity = 'Standard';
@@ -59,17 +59,15 @@ function PlayerCard({ id, name, team, price, flag, stats, onBuy, onSell, isOwned
                 src={`https://flagcdn.com/w40/${flag.toLowerCase()}.png`} 
                 alt={`Drapeau ${name}`} 
                 className="card-flag"
-                style={{ width: '30px', borderRadius: '4px', boxShadow: '0 2px 5px rgba(0,0,0,0.5)' }} 
               />
             ) : (
               <span className="card-flag" aria-hidden="true">🌍</span>
             )}
             
             {isOwned && rank && (
-              <span style={{
+              <span className="rank-badge" style={{
                 background: rankStyle[rank]?.bg || '#fff', color: rankStyle[rank]?.color || '#000',
-                boxShadow: rankStyle[rank]?.shadow, padding: '3px 8px', borderRadius: '4px',
-                fontWeight: '900', fontSize: '0.9rem', border: '1px solid rgba(255,255,255,0.2)'
+                boxShadow: rankStyle[rank]?.shadow
               }}>
                 RANG {rank}
               </span>
@@ -77,18 +75,9 @@ function PlayerCard({ id, name, team, price, flag, stats, onBuy, onSell, isOwned
             <span className="rarity-badge">{rarity}</span>
           </div>
 
-          <div className="player-photo-container" style={{ width: '100%', height: '140px', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden', marginBottom: '10px' }}>
-              <img 
-                src={`/players/${id}.png`} alt={`Portrait ${name}`}
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.nextSibling.style.display = 'flex';
-                }}
-                style={{ height: '100%', objectFit: 'contain' }}
-              />
-              <div aria-hidden="true" style={{ display: 'none', fontSize: '4rem', fontWeight: 'bold', color: '#555', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
-                {initial}
-              </div>
+          {/* 🪄 LE MAILLOT DYNAMIQUE FAÇON FIFA */}
+          <div className="player-photo-container">
+             <DynamicJersey player={{ id, name, flag }} />
           </div>
 
           <div className="player-info">
@@ -111,7 +100,7 @@ function PlayerCard({ id, name, team, price, flag, stats, onBuy, onSell, isOwned
                   REVENDRE (+{actualSellPrice.toLocaleString()} 🎫)
                 </button>
               ) : (
-                <div style={{ color: '#888', fontStyle: 'italic', padding: '10px 0' }}>En sécurité</div>
+                <div className="safe-status">En sécurité</div>
               )
             ) : (
               <button className="btn-buy" onClick={handleActionClick}>ACQUÉRIR</button>
@@ -125,7 +114,7 @@ function PlayerCard({ id, name, team, price, flag, stats, onBuy, onSell, isOwned
           <h4 className="back-title">ARCHIVES : {name}</h4>
           
           {stats ? (
-            <div aria-label="Détail du palmarès">
+            <div aria-label="Détail du palmarès" className="palmares-container">
               <div className="palmares-section">
                 <div className="palmares-title">🏆 Coupe du Monde</div>
                 <div className="palmares-years">{stats.wc} victoire(s)</div>
