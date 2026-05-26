@@ -1,9 +1,22 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 
 function Navbar() {
   const location = useLocation(); 
+  const navigate = useNavigate(); // 👈 L'outil pour rediriger après le nettoyage
+
   const isActive = (path) => location.pathname === path ? '#00ffcc' : 'white';
+
+  // 🧹 La fonction de nettoyage absolu
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('regista_collection');
+    localStorage.removeItem('regista_solde');
+    
+    // On renvoie l'agent vers la page de connexion
+    navigate('/'); 
+  };
 
   return (
     <nav style={{ 
@@ -25,9 +38,22 @@ function Navbar() {
       </div>
 
       <div>
-        <Link to="/" style={{ border: '1px solid #00ffcc', color: '#00ffcc', padding: '8px 15px', borderRadius: '6px', textDecoration: 'none' }}>
+        {/* On remplace le <Link> par un vrai <button> qui lance le nettoyage */}
+        <button 
+          onClick={handleLogout} 
+          style={{ 
+            background: 'transparent',
+            border: '1px solid #00ffcc', 
+            color: '#00ffcc', 
+            padding: '8px 15px', 
+            borderRadius: '6px', 
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '1rem'
+          }}
+        >
           DÉCONNEXION
-        </Link>
+        </button>
       </div>
     </nav>
   );

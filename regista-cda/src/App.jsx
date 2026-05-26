@@ -58,15 +58,35 @@ function App() {
     setTransactions(prev => [{ time, motif, montant, type: montant > 0 ? 'REVENU' : 'DÉPENSE' }, ...prev]);
   };
 
+  // 🛠️ MODIFICATION ICI : Sécurité Anti-NaN et appel au backend ACID
   const handleSellPlayer = (playerId) => {
     const playerToSell = myCollection.find(p => p.id === playerId);
+    
     if (playerToSell) {
-      const coefs = { 'S': 1.2, 'A': 0.8, 'B': 0.6, 'C': 0.4 };
-      const sellPrice = Math.floor(playerToSell.price * (coefs[playerToSell.rank] || 0.5));
+      const coefs = { 'S': 1.2, 'A': 0.8, 'B': 0.6, 'C': 0.4, 'D': 0.2 };
+      
+      // 🛡️ SÉCURITÉ ANTI-NaN : Récupère les valeurs qu'elles soient sous l'ancien ou le nouveau nom
+      const safePrice = playerToSell.price || playerToSell.base_value || 10000;
+      const safeRank = playerToSell.rank || playerToSell.tier || 'C';
+      const safeName = playerToSell.name || "Légende Inconnue";
+      
+      const sellPrice = Math.floor(safePrice * (coefs[safeRank] || 0.5));
+      
+      // 1. Mise à jour de l'affichage Front-end
       setSolde(prev => prev + sellPrice);
-      addTransaction(`Revente ${playerToSell.name}`, sellPrice);
+      addTransaction(`Revente ${safeName}`, sellPrice);
       setMyCollection(prev => prev.filter(p => p.id !== playerId));
-      return { name: playerToSell.name, price: sellPrice, date: new Date().toLocaleTimeString() };
+
+      // 2. 🚀 APPEL AU BACKEND : On lance la transaction sécurisée (ACID) !
+      const storedUser = localStorage.getItem('username') || "Joueur_Test";
+      fetch('http://localhost:4000/api/market/sell', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: storedUser, cardId: playerId, price: sellPrice })
+      }).catch(err => console.error("Erreur Vente Backend:", err));
+
+      // 3. On retourne les infos propres pour le ticket de caisse de l'Agence
+      return { name: safeName, rank: safeRank, price: sellPrice, date: new Date().toLocaleTimeString() };
     }
     return null;
   };
@@ -80,19 +100,20 @@ function App() {
     return false; 
   };
 
+  // 🛠️ MODIFICATION ICI : Mapping parfait pour s'assurer que les stats sont lisibles
   const handleWinCard = (playerName, teamName, achievedRank, basePrice, fullCardData) => {
     const newCard = {
-      id: Date.now(), 
-      name: playerName,
-      team: teamName,
-      rank: achievedRank,
-      price: basePrice,
+      id: fullCardData.id || Date.now(), 
+      name: fullCardData.name || playerName,
+      team: "Légende", // On force "Légende" au lieu du club de la grille
+      rank: fullCardData.tier || fullCardData.rank || achievedRank,
+      price: fullCardData.base_value || fullCardData.price || basePrice,
       flag: fullCardData.flag,
-      stats: {
-        wc: fullCardData.wc_won,
-        ucl: fullCardData.ucl_won,
-        league: fullCardData.league_won,
-        cup: fullCardData.cup_won
+      stats: fullCardData.stats || {
+        wc: fullCardData.wc_won || 0,
+        ucl: fullCardData.ucl_won || 0,
+        league: fullCardData.league_won || 0,
+        cup: fullCardData.cup_won || 0
       }
     };
     setMyCollection(prev => [newCard, ...prev]);
