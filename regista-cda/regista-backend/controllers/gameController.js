@@ -1,0 +1,80 @@
+const dbPool = require('../config/db');
+
+// Route de démarrage : On garde vos anciennes tables !
+exports.startGame = async (req, res) => {
+    const teamName = req.params.teamName;
+    const sqlQuery = `
+        SELECT t.name AS team, p.id AS player_id, p.name AS player_name, p.grid_type, h.hint_text, h.hint_order
+        FROM teams t JOIN players_pool p ON t.id = p.team_id LEFT JOIN hints h ON p.id = h.player_id
+        WHERE t.name = ? ORDER BY p.grid_type ASC, h.hint_order ASC
+    `;
+    try {
+        const [results] = await dbPool.execute(sqlQuery, [teamName]);
+        
+        // Sécurité : Si l'équipe n'existe pas en base, on renvoie une erreur 404 claire
+        if (results.length === 0) {
+            return res.status(404).json({ error: `Aucune donnée trouvée pour l'équipe ${teamName}` });
+        }
+
+        const gameSession = { team: teamName, grids: [{ type: 4, player: null, hints: [] }, { type: 5, player: null, hints: [] }, { type: 6, player: null, hints: [] }] };
+        
+        results.forEach(row => {
+            const grid = gameSession.grids.find(g => g.type === row.grid_type);
+            if (grid) {
+                grid.player = row.player_name;
+                if (row.hint_text) grid.hints.push(row.hint_text);
+            }
+        });
+        res.json(gameSession);
+    } catch (error) {
+        // LE VOILÀ ! Le fameux mouchard qui nous dira tout dans le terminal Docker :
+        console.error("🚨 ERREUR SQL DANS STARTGAME :", error); 
+        res.status(500).json({ error: 'Erreur SQL lors du chargement de la partie' });
+    }
+};
+
+// Route de soumission : Anti-triche + Calcul + Tirage
+exports.submitGame = async (req, res) => {
+    const userId = req.user.id; 
+    const { tempsDeclare, erreursCount } = req.body; // Le front n'envoie plus le solde !
+
+    if (tempsDeclare > 45 || tempsDeclare <= 0) {
+        return res.status(400).json({ error: "Fraude détectée : Temps hors limites." });
+    }
+
+    try {
+        // 1. Calcul du score côté serveur
+        const baseReward = 500; // OAT gagnés par grille réussie
+        const multiplicateur = 1 - (tempsDeclare / 45);
+        let oatGagnes = Math.floor(baseReward * multiplicateur);
+        if (erreursCount > 0) oatGagnes = Math.floor(oatGagnes * 0.5); // Malus d'erreur
+
+        // 2. Mise à jour du solde de l'agent
+        await dbPool.execute(
+            `UPDATE users SET solde = solde + ? WHERE id = ?`, 
+            [oatGagnes, userId]
+        );
+
+        // 3. Tirage automatique d'une carte récompense (Fusion de votre ancienne route)
+        // On tire une carte de Rang B au hasard pour le test
+        const [cards] = await dbPool.execute(`SELECT * FROM legendary_cards WHERE tier = 'B' ORDER BY RAND() LIMIT 1`);
+        let carteGagnee = null;
+        
+        if (cards.length > 0) {
+            carteGagnee = cards[0];
+            await dbPool.execute(`UPDATE users SET cartes = cartes + 1 WHERE id = ?`, [userId]);
+        }
+
+        // 4. On renvoie les données tradées pour React (DTO)
+        res.status(200).json({
+            success: true,
+            oatGagnes: oatGagnes,
+            carteTiree: carteGagnee,
+            message: `Grille validée ! Vous avez gagné ${oatGagnes} OAT.`
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors du traitement algorithmique.' });
+    }
+};

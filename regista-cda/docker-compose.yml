@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # 1. Le conteneur de la Base de Données
+  regista-db:
+    image: mysql:8.0
+    container_name: regista_mysql_container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: regista_db
+    ports:
+      - "3306:3306"
+    volumes:
+      # Injection du fichier local
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      # CORRECTION ICI : mysql_data au lieu de db_data
+      - mysql_data:/var/lib/mysql
+      
+    networks:
+      - regista-network
+
+  # 2. Le conteneur de votre API Node.js
+  regista-api:
+    build: ./regista-backend
+    container_name: regista_api_container
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+      # L'API se connecte au nom du conteneur de la BDD (regista-db)
+      - DB_HOST=regista-db
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=regista_db
+      - JWT_SECRET=OnAirTech_Regista_Secret_Key_2026_CDA
+    depends_on:
+      - regista-db
+    networks:
+      - regista-network
+
+# Déclaration du volume persistant
+volumes:
+  mysql_data:
+
+networks:
+  regista-network:
+    driver: bridge
