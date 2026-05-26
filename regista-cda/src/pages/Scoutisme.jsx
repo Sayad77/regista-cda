@@ -60,10 +60,27 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
   useEffect(() => {
     if (!selectedTeam) return; 
     setGameData(null); 
-    fetch(`http://localhost:4000/api/game/start/${selectedTeam}`)
-      .then(res => res.json())
+    
+    // 1. On va chercher le jeton dans le coffre-fort de React (LocalStorage)
+    const token = localStorage.getItem('token');
+
+    // 2. On attache ce jeton à la requête fetch avec l'en-tête "Authorization"
+    fetch(`http://localhost:4000/api/game/start/${selectedTeam}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}` 
+      }
+    })
+      .then(res => {
+          if (!res.ok) throw new Error(`Erreur serveur : ${res.status}`);
+          return res.json();
+      })
       .then(data => setGameData(data))
-      .catch(err => console.error("Erreur:", err));
+      .catch(err => {
+          console.error("Erreur d'accès aux données du jeu :", err);
+          setErrorMsg("Accès refusé. Veuillez vous reconnecter.");
+      });
   }, [selectedTeam]);
 
   useEffect(() => {
@@ -104,7 +121,11 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
         else if (indicesReveles <= 3 && secondsElapsed <= 180) finalRank = 'B'; 
         
         try {
-          const response = await fetch(`http://localhost:4000/api/cards/draw/${finalRank}`);
+          // SÉCURISATION DE LA REQUÊTE DE VICTOIRE
+          const token = localStorage.getItem('token');
+          const response = await fetch(`http://localhost:4000/api/cards/draw/${finalRank}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+          });
           const drawnCard = await response.json();
 
           onWinCard(drawnCard.name, gameData.team, finalRank, drawnCard.base_value, drawnCard);
@@ -148,7 +169,11 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
       setErrorMsg('');
     } else {
       try {
-        const response = await fetch(`http://localhost:4000/api/cards/draw/D`);
+        // SÉCURISATION DE LA REQUÊTE DE RÉVÉLATION
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:4000/api/cards/draw/D`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
         const drawnCard = await response.json();
 
         onWinCard(drawnCard.name, gameData.team, 'D', drawnCard.base_value, drawnCard);
@@ -295,7 +320,22 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
     );
   }
 
-  if (!gameData) return <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh' }}><Navbar /><div style={{ color: '#d4af37', textAlign: 'center', marginTop: '50px', fontSize: '1.5rem' }} aria-live="polite">📡 Infiltration des serveurs en cours...</div></div>;
+ if (!gameData) return (
+    <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh' }}>
+      <Navbar />
+      <div style={{ textAlign: 'center', marginTop: '100px', fontSize: '1.5rem' }}>
+        {errorMsg ? (
+          <div style={{ color: '#ff4444', background: '#222', padding: '30px', borderRadius: '10px', display: 'inline-block' }}>
+            <p>❌ <strong>ALERTE ROUGE :</strong> Le serveur a rejeté la demande.</p>
+            <p>Raison : <i>{errorMsg}</i></p>
+            <button onClick={() => window.location.reload()} style={{ marginTop: '20px', padding: '10px 20px', cursor: 'pointer', fontWeight: 'bold' }}>Rafraîchir</button>
+          </div>
+        ) : (
+          <span style={{ color: '#d4af37' }}>📡 Infiltration des serveurs en cours...</span>
+        )}
+      </div>
+    </div>
+  );
 
   // VUE 3 : JEU
   return (

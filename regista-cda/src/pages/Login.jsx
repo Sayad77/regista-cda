@@ -12,10 +12,8 @@ function Login() {
     e.preventDefault();
     setError('');
 
-    // On s'adapte à ton backend local pour la connexion/inscription
     const endpoint = isLoginMode ? 'http://localhost:4000/api/login' : 'http://localhost:4000/api/register';
     
-    // Si on s'inscrit, on envoie aussi l'email
     const payload = isLoginMode 
         ? { pseudo: form.pseudo, password: form.password } 
         : { pseudo: form.pseudo, email: form.email, password: form.password };
@@ -26,16 +24,33 @@ function Login() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      const data = await response.json();
+      
+      // On sécurise la lecture du JSON
+      let data;
+      try {
+          data = await response.json();
+      } catch (parseError) {
+          console.error("Le serveur n'a pas renvoyé un JSON valide :", parseError);
+          throw new Error("Erreur interne du serveur. Regardez les logs de Docker !");
+      }
       
       if (response.ok || data.success) {
         localStorage.setItem('username', form.pseudo);
+        // CORRECTION MAJEURE : data.token et non response.data.token
+        localStorage.setItem('token', data.token); 
         navigate('/home');
       } else {
         setError(data.error || data.message || "Erreur d'authentification");
       }
     } catch (err) { 
-        setError("Impossible de joindre le serveur de l'Agence."); 
+      // On affiche la vraie erreur dans la console F12 pour comprendre
+      console.error("🚨 Vraie erreur capturée :", err);
+      
+      if (err.message === "Failed to fetch") {
+          setError("Impossible de joindre le serveur. (Problème de CORS ou port 4000 éteint).");
+      } else {
+          setError(err.message || "Une erreur inconnue s'est produite.");
+      }
     }
   };
 
@@ -56,7 +71,6 @@ function Login() {
               style={inputStyle} required
             />
             
-            {/* On demande l'email uniquement à l'inscription */}
             {!isLoginMode && (
               <input 
                 type="email" placeholder="ADRESSE EMAIL" 
@@ -83,7 +97,6 @@ function Login() {
               {isLoginMode ? "Pas encore de compte ? S'inscrire" : "Déjà agent ? Se connecter"}
             </p>
             
-            {/* VOICI LE LIEN MOT DE PASSE OUBLIÉ */}
             {isLoginMode && (
               <Link to="/forgot-password" style={forgotStyle}>
                 Mot de passe oublié ?
