@@ -33,10 +33,10 @@ exports.startGame = async (req, res) => {
     }
 };
 
-// Route de soumission : Anti-triche + Calcul + Tirage
+// Route de soumission : Anti-triche + Calcul + Tirage dynamique + ACID
 exports.submitGame = async (req, res) => {
     const userId = req.user.id; 
-    const { tempsDeclare, erreursCount } = req.body; // Le front n'envoie plus le solde !
+    const { tempsDeclare, erreursCount, indiceUtilise } = req.body; 
 
     if (tempsDeclare > 45 || tempsDeclare <= 0) {
         return res.status(400).json({ error: "Fraude détectée : Temps hors limites." });
@@ -44,10 +44,16 @@ exports.submitGame = async (req, res) => {
 
     try {
         // 1. Calcul du score côté serveur
-        const baseReward = 500; // OAT gagnés par grille réussie
+        const baseReward = 500; 
         const multiplicateur = 1 - (tempsDeclare / 45);
         let oatGagnes = Math.floor(baseReward * multiplicateur);
         if (erreursCount > 0) oatGagnes = Math.floor(oatGagnes * 0.5); // Malus d'erreur
+
+        // 🎯 Détermination DYNAMIQUE du rang de performance
+        let rang = 'D';
+        if (tempsDeclare <= 15 && erreursCount === 0 && !indiceUtilise) rang = 'S';
+        else if (tempsDeclare <= 25 && erreursCount <= 1) rang = 'A';
+        else if (tempsDeclare <= 40 && erreursCount <= 2) rang = 'B';
 
         // 2. Mise à jour du solde de l'agent
         await dbPool.execute(
@@ -55,26 +61,55 @@ exports.submitGame = async (req, res) => {
             [oatGagnes, userId]
         );
 
-        // 3. Tirage automatique d'une carte récompense (Fusion de votre ancienne route)
-        // On tire une carte de Rang B au hasard pour le test
-        const [cards] = await dbPool.execute(`SELECT * FROM legendary_cards WHERE tier = 'B' ORDER BY RAND() LIMIT 1`);
+        // 3. 🎲 TIRAGE AUTOMATIQUE ET ENREGISTREMENT EN BASE
+        // On pioche une légende qui correspond VRAIMENT au rang obtenu !
+        const [cards] = await dbPool.execute(
+            `SELECT * FROM legendary_cards WHERE tier = ? ORDER BY RAND() LIMIT 1`,
+            [rang]
+        );
+        
         let carteGagnee = null;
         
         if (cards.length > 0) {
-            carteGagnee = cards[0];
+            const drawnCard = cards[0];
+            
+            // 🔥 CORRECTION CRITIQUE : ON SAUVEGARDE LA LIAISON DANS L'INVENTAIRE SQL !
+            await dbPool.execute(
+                `INSERT INTO inventaire (user_id, card_id) VALUES (?, ?)`,
+                [userId, drawnCard.id]
+            );
+
+            // Mise à jour du compteur global de l'utilisateur
             await dbPool.execute(`UPDATE users SET cartes = cartes + 1 WHERE id = ?`, [userId]);
+
+            // 🪄 LE MAPPING BACKEND : On traduit les colonnes SQL pour le composant PlayerCard de React
+            carteGagnee = {
+                id: drawnCard.id,
+                name: drawnCard.name,
+                team: "Légende",
+                rank: drawnCard.tier,
+                price: drawnCard.base_value,
+                flag: drawnCard.flag,
+                stats: {
+                    wc: drawnCard.wc_won,
+                    ucl: drawnCard.ucl_won,
+                    league: drawnCard.league_won,
+                    cup: drawnCard.cup_won
+                }
+            };
         }
 
-        // 4. On renvoie les données tradées pour React (DTO)
+        // 4. On renvoie les données propres au Front-end (React)
         res.status(200).json({
             success: true,
             oatGagnes: oatGagnes,
-            carteTiree: carteGagnee,
-            message: `Grille validée ! Vous avez gagné ${oatGagnes} OAT.`
+            carteTiree: carteGagnee, // Contient maintenant le vrai nom (ex: Ronaldinho) et ses stats !
+            rang: rang,
+            message: `Grille validée ! Vous avez gagné ${oatGagnes} OAT et une carte de Rang ${rang}.`
         });
 
     } catch (error) {
-        console.error(error);
+        console.error("🚨 ERREUR LORS DE LA SOUMISSION DU JEU :", error);
         res.status(500).json({ error: 'Erreur lors du traitement algorithmique.' });
     }
 };
