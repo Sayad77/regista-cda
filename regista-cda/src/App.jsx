@@ -10,6 +10,9 @@ import Agency from './pages/Agency'
 import Leaderboard from './pages/Leaderboard'
 import Home from './pages/Home' 
 import Scoutisme from './pages/Scoutisme';
+import CookieBanner from './components/CookieBanner';
+import MentionsLegales from './pages/MentionsLegales';
+import Confidentialite from './pages/Confidentialite';
 
 function App() {
   const [solde, setSolde] = useState(() => {
@@ -100,20 +103,21 @@ function App() {
     return false; 
   };
 
-  // 🛠️ MODIFICATION ICI : Mapping parfait pour s'assurer que les stats sont lisibles
   const handleWinCard = (playerName, teamName, achievedRank, basePrice, fullCardData) => {
+    const actualCard = fullCardData.card || fullCardData.carteTiree || fullCardData;
+
     const newCard = {
-      id: fullCardData.id || Date.now(), 
-      name: fullCardData.name || playerName,
-      team: "Légende", // On force "Légende" au lieu du club de la grille
-      rank: fullCardData.tier || fullCardData.rank || achievedRank,
-      price: fullCardData.base_value || fullCardData.price || basePrice,
-      flag: fullCardData.flag,
-      stats: fullCardData.stats || {
-        wc: fullCardData.wc_won || 0,
-        ucl: fullCardData.ucl_won || 0,
-        league: fullCardData.league_won || 0,
-        cup: fullCardData.cup_won || 0
+      id: actualCard.id || Date.now(), 
+      name: actualCard.name || playerName || "Légende Inconnue",
+      team: "Légende",
+      rank: actualCard.tier || actualCard.rank || achievedRank,
+      price: actualCard.price || actualCard.base_value || basePrice || 0,
+      flag: actualCard.flag,
+      stats: actualCard.stats || {
+        wc: actualCard.wc_won || 0,
+        ucl: actualCard.ucl_won || 0,
+        league: actualCard.league_won || 0,
+        cup: actualCard.cup_won || 0
       }
     };
     setMyCollection(prev => [newCard, ...prev]);
@@ -121,6 +125,9 @@ function App() {
 
   return (
     <>
+      {/* ✅ LE BANDEAU EST PLACÉ ICI : En dehors des routes et des autres conteneurs */}
+      <CookieBanner />
+
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -129,6 +136,8 @@ function App() {
         <Route path="/agency" element={<Agency myCollection={myCollection} onSellPlayer={handleSellPlayer} />} />
         <Route path="/bank" element={<BankVault solde={solde} transactions={transactions} myCollection={myCollection} />} />
         <Route path="/game" element={<Scoutisme solde={solde} onBuyHint={handleBuyHint} onWinCard={handleWinCard} />} />
+        <Route path="/mentions-legales" element={<MentionsLegales />} />
+        <Route path="/confidentialite" element={<Confidentialite />} />
       </Routes>
 
       <div className={`sync-indicator ${syncStatus}`}>
