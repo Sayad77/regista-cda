@@ -62,4 +62,48 @@ exports.register = async (req, res) => {
         console.error("🚨 ERREUR SQL LORS DE L'INSCRIPTION :", error.message); 
         res.status(409).json({ error: 'Erreur serveur. Regardez le terminal Node.js !' }); 
     }
+    // ... (vos fonctions login et register existantes) ...
+
+exports.deleteAccount = async (req, res) => {
+    // 1. L'ID est fourni par votre garde du corps (le middleware auth.js) grâce au token !
+    const userId = req.user.id; 
+
+    if (!userId) {
+        return res.status(400).json({ error: 'Utilisateur non identifié.' });
+    }
+
+    let connection;
+    try {
+        // 2. 🚀 TRANSACTION ACID : On prend une connexion isolée
+        connection = await dbPool.getConnection();
+        await connection.beginTransaction();
+
+        // 3. ÉTAPE A : On vide le coffre-fort (Suppression des cartes dans l'inventaire)
+        await connection.execute('DELETE FROM inventaire WHERE user_id = ?', [userId]);
+
+        // 4. ÉTAPE B : On supprime l'Agent (Suppression dans la table users)
+        const [result] = await connection.execute('DELETE FROM users WHERE id = ?', [userId]);
+
+        // Vérification de sécurité au cas où le compte aurait déjà été supprimé
+        if (result.affectedRows === 0) {
+            await connection.rollback(); 
+            return res.status(404).json({ error: 'Agent introuvable.' });
+        }
+
+        // 5. VALIDATION : Tout s'est bien passé, on grave la destruction dans le marbre
+        await connection.commit();
+        console.log(`🗑️ L'Agent ID ${userId} a été définitivement effacé de la base.`);
+        
+        res.status(200).json({ success: true, message: 'Données détruites avec succès.' });
+
+    } catch (error) {
+        // 🛡️ SÉCURITÉ : S'il y a un crash au milieu, on annule tout pour ne rien corrompre !
+        if (connection) await connection.rollback();
+        console.error("🚨 Erreur critique lors de la suppression :", error);
+        res.status(500).json({ error: 'Échec de la procédure de destruction.' });
+    } finally {
+        // 6. On rend la connexion au serveur
+        if (connection) connection.release();
+    }
+};
 };
