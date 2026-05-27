@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Navbar from '../components/Navbar';
 
-// Liste complète et préservée de tes 36 clubs
+// Liste complète et préservée de vos 36 clubs
 const availableMissions = [
   { id: 'Arsenal', name: 'ARSENAL', difficulty: 'Difficile', color: '#ef0107' },
   { id: 'Bayern', name: 'BAYERN MÜNCHEN', difficulty: 'Difficile', color: '#dc052d' },
@@ -51,9 +51,8 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
   const [secondsElapsed, setSecondsElapsed] = useState(0);
   const [hasSkipped, setHasSkipped] = useState(false); 
 
-  // 🪄 ÉTAT POUR LA MODAL SUR-MESURE
+  // Modal pour la révélation
   const [revealModal, setRevealModal] = useState({ isOpen: false, player: null });
-
   const [errorMsg, setErrorMsg] = useState(''); 
   const [victoryData, setVictoryData] = useState(null); 
 
@@ -61,10 +60,8 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
     if (!selectedTeam) return; 
     setGameData(null); 
     
-    // 1. On va chercher le jeton dans le coffre-fort de React (LocalStorage)
     const token = localStorage.getItem('token');
 
-    // 2. On attache ce jeton à la requête fetch avec l'en-tête "Authorization"
     fetch(`http://localhost:4000/api/game/start/${selectedTeam}`, {
       method: 'GET',
       headers: {
@@ -84,7 +81,7 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
   }, [selectedTeam]);
 
   useEffect(() => {
-    if (!gameData || victoryData || revealModal.isOpen) return; // Le temps s'arrête si la modal est ouverte !
+    if (!gameData || victoryData || revealModal.isOpen) return; 
     const interval = setInterval(() => setSecondsElapsed(prev => prev + 1), 1000);
     return () => clearInterval(interval);
   }, [gameData, currentGridIndex, victoryData, revealModal.isOpen]);
@@ -121,25 +118,39 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
         else if (indicesReveles <= 3 && secondsElapsed <= 180) finalRank = 'B'; 
         
         try {
-          // SÉCURISATION DE LA REQUÊTE DE VICTOIRE
           const token = localStorage.getItem('token');
+          console.log("DEBUG - finalRank calculé avant fetch :", finalRank);
+          
           const response = await fetch(`http://localhost:4000/api/cards/draw/${finalRank}`, {
               headers: { 'Authorization': `Bearer ${token}` }
           });
-          const drawnCard = await response.json();
-
-          onWinCard(drawnCard.name, gameData.team, finalRank, drawnCard.base_value, drawnCard);
           
+          const jsonResponse = await response.json();
+
+          // 🛡️ LE BARRAGE : Si le serveur refuse (ex: 401 Token invalide), on jette une erreur !
+          if (!response.ok) {
+              throw new Error(jsonResponse.error || "Accès refusé par l'Agence (Token invalide).");
+          }
+
+          // On extrait la carte du tiroir JSON
+          const drawnCard = jsonResponse.card || jsonResponse.carteTiree || jsonResponse;
+
+          // On envoie la carte à App.jsx
+          onWinCard(drawnCard.name, gameData.team, finalRank, drawnCard.price || drawnCard.base_value, drawnCard);
+          
+          // On affiche l'écran de victoire avec les vraies données
           setVictoryData({ 
             player: drawnCard.name, 
             description: drawnCard.description,
-            value: drawnCard.base_value,
+            value: drawnCard.price || drawnCard.base_value,
             rank: finalRank, 
             flag: drawnCard.flag, 
             time: formattedTime 
           });
-        } catch (error) {
-          setErrorMsg("Erreur lors de la communication avec l'Agence.");
+        } catch (error) { 
+          console.error("Erreur API :", error);
+          // 🛑 Affiche le vrai message d'erreur envoyé par le barrage
+          setErrorMsg(error.message || "Erreur lors de la communication avec l'Agence.");
         }
       }
     } else {
@@ -150,14 +161,12 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
     }
   };
 
-  // 🪄 1. FONCTION QUI OUVRE LA MODAL
   const triggerReveal = () => {
     setRevealModal({ isOpen: true, player: currentGrid.player });
   };
 
-  // 🪄 2. FONCTION QUAND LE JOUEUR CLIQUE SUR "COMPRIS" DANS LA MODAL
   const confirmReveal = async () => {
-    setRevealModal({ isOpen: false, player: null }); // On ferme la modal
+    setRevealModal({ isOpen: false, player: null }); 
     
     if (currentGridIndex < 2) {
       setHasSkipped(true);
@@ -169,25 +178,36 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
       setErrorMsg('');
     } else {
       try {
-        // SÉCURISATION DE LA REQUÊTE DE RÉVÉLATION
         const token = localStorage.getItem('token');
         const response = await fetch(`http://localhost:4000/api/cards/draw/D`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        const drawnCard = await response.json();
-
-        onWinCard(drawnCard.name, gameData.team, 'D', drawnCard.base_value, drawnCard);
         
+        const jsonResponse = await response.json();
+
+        // 🛡️ LE BARRAGE : Idem pour la révélation !
+        if (!response.ok) {
+            throw new Error(jsonResponse.error || "Accès refusé par l'Agence (Token invalide).");
+        }
+
+        const drawnCard = jsonResponse.card || jsonResponse.carteTiree || jsonResponse;
+
+        // On envoie à App.jsx
+        onWinCard(drawnCard.name, gameData.team, 'D', drawnCard.price || drawnCard.base_value, drawnCard);
+        
+        // On affiche la victoire
         setVictoryData({ 
           player: drawnCard.name, 
           description: drawnCard.description,
-          value: drawnCard.base_value,
+          value: drawnCard.price || drawnCard.base_value,
           rank: 'D', 
           flag: drawnCard.flag, 
           time: formattedTime 
         });
       } catch (error) {
-        setErrorMsg("Erreur lors de la communication avec l'Agence.");
+        console.error("Erreur API :", error);
+        // 🛑 Affiche le vrai message d'erreur
+        setErrorMsg(error.message || "Erreur lors de la communication avec l'Agence.");
       }
     }
   };
@@ -342,7 +362,7 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
     <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', fontFamily: 'sans-serif' }}>
       <Navbar />
 
-      {/* 🪄 LA NOUVELLE MODAL QUI S'AFFICHE PAR-DESSUS LE JEU */}
+      {/* MODAL DOSSIER DÉCLASSIFIÉ */}
       {revealModal.isOpen && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
@@ -455,7 +475,6 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
             VALIDER LE NOM
           </button>
 
-          {/* BOUTON DÉCLENCHEUR DE LA MODAL */}
           <button 
             onClick={triggerReveal} 
             style={{ width: '100%', backgroundColor: 'transparent', color: '#ff4444', border: '1px dashed #ff4444', borderRadius: '5px', padding: '10px', marginTop: '15px', fontSize: '0.9rem', cursor: 'pointer', transition: 'all 0.3s' }}

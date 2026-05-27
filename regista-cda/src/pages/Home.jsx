@@ -30,13 +30,45 @@ function Home() {
             </li>
           </ul>
 
-          <div style={{ textAlign: 'center', marginTop: '40px' }}>
+          {/* ⚖️ Les liens juridiques (RGPD) */}
+          <div style={{ 
+            marginTop: '30px', 
+            marginBottom: '20px', 
+            textAlign: 'center', 
+            fontSize: '0.85rem',
+            borderTop: '1px solid #333',
+            paddingTop: '15px'
+          }}>
+            <Link 
+              to="/mentions-legales" 
+              style={{ color: '#888', textDecoration: 'none', marginRight: '20px', transition: 'color 0.2s' }}
+              onMouseEnter={(e) => e.target.style.color = '#d4af37'}
+              onMouseLeave={(e) => e.target.style.color = '#888'}
+            >
+              Mentions Légales
+            </Link>
+            <Link 
+              to="/confidentialite" 
+              style={{ color: '#888', textDecoration: 'none', transition: 'color 0.2s' }}
+              onMouseEnter={(e) => e.target.style.color = '#d4af37'}
+              onMouseLeave={(e) => e.target.style.color = '#888'}
+            >
+              Politique de Confidentialité (RGPD)
+            </Link>
+          </div>
+
+          {/* 🎮 Le bouton principal pour Jouer */}
+          <div style={{ textAlign: 'center', marginTop: '30px' }}>
             <Link to="/game" style={{ 
               display: 'inline-block', background: 'linear-gradient(45deg, #d4af37, #f0c641)', 
               color: '#000', padding: '15px 40px', borderRadius: '8px', fontSize: '1.3rem', 
-              fontWeight: 'bold', textDecoration: 'none', textTransform: 'uppercase'
-            }}>
-              J'ai compris, Jouer
+              fontWeight: 'bold', textDecoration: 'none', textTransform: 'uppercase',
+              boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)', transition: 'transform 0.2s'
+            }}
+            onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+            onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+            >
+              J'AI COMPRIS, JOUER
             </Link>
           </div>
         </div>
