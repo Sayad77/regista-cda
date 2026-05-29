@@ -76,4 +76,4 @@ Arrêter les serveurs proprement : docker compose down
 
 📝 Auteurs & Licence
 Projet développé, architecturé et déployé par Sayadali Madarbukus (Président) avec l'infrastructure OnAirTech.
-Projet académique de certification CDA.
+Projet académique de certification CDA. 2026
