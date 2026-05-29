@@ -1,10 +1,22 @@
-import { Link } from 'react-router-dom';
-import Navbar from '../components/Navbar';
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import Navbar from '../components/Navbar'; // 👈 1. IMPORT DE LA NAVBAR RESTAURÉ
 
 function Home() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/'); 
+    }
+  }, [navigate]);
+
   return (
     <div className="app-container">
-      <Navbar />
+      {/* 👈 2. AFFICHAGE DE LA NAVBAR POUR ACCÉDER À LA BANQUE, AGENCE, ETC. */}
+      <Navbar /> 
+      
       <main style={{ padding: '4rem 2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         
         <h1 style={{ color: '#d4af37', fontSize: '2.5rem', marginBottom: '2rem', textTransform: 'uppercase', letterSpacing: '3px' }}>
@@ -25,12 +37,11 @@ function Home() {
             <li style={{ marginBottom: '20px' }}>
               <strong style={{ color: 'white' }}>• L'AGENCE ONAIRTECH 🏢 :</strong> Vous n'avez plus de billets ? Revendez vos cartes à l'Agence. Une carte Rang S vaut très cher !
             </li>
-            <li>
+            <li style={{ marginBottom: '20px' }}>
               <strong style={{ color: 'white' }}>• LA BANQUE 🏦 :</strong> Consultez votre historique de transactions et admirez les cartes stockées dans votre coffre-fort.
             </li>
           </ul>
 
-          {/* ⚖️ Les liens juridiques (RGPD) */}
           <div style={{ 
             marginTop: '30px', 
             marginBottom: '20px', 
@@ -40,26 +51,18 @@ function Home() {
             paddingTop: '15px'
           }}>
             <Link 
-              to="/mentions-legales" 
-              style={{ color: '#888', textDecoration: 'none', marginRight: '20px', transition: 'color 0.2s' }}
-              onMouseEnter={(e) => e.target.style.color = '#d4af37'}
-              onMouseLeave={(e) => e.target.style.color = '#888'}
-            >
-              Mentions Légales
-            </Link>
-            <Link 
               to="/confidentialite" 
               style={{ color: '#888', textDecoration: 'none', transition: 'color 0.2s' }}
               onMouseEnter={(e) => e.target.style.color = '#d4af37'}
               onMouseLeave={(e) => e.target.style.color = '#888'}
             >
-              Politique de Confidentialité (RGPD)
+              Mentions Légales & Politique de Confidentialité (RGPD)
             </Link>
           </div>
 
-          {/* 🎮 Le bouton principal pour Jouer */}
           <div style={{ textAlign: 'center', marginTop: '30px' }}>
-            <Link to="/game" style={{ 
+            {/* 👈 3. CORRECTION DU LIEN VERS SCOUTISME */}
+            <Link to="/scoutisme" style={{ 
               display: 'inline-block', background: 'linear-gradient(45deg, #d4af37, #f0c641)', 
               color: '#000', padding: '15px 40px', borderRadius: '8px', fontSize: '1.3rem', 
               fontWeight: 'bold', textDecoration: 'none', textTransform: 'uppercase',
