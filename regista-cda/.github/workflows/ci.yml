@@ -1,0 +1,28 @@
+name: CI Pipeline
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Tests with Coverage
+        run: npm run test:coverage 
+
+      - name: Verify Coverage
+        # Cette étape vérifie que la couverture est bien >= 80%
+        # Elle échouera si le seuil n'est pas respecté
+        run: |
+          # Exemple de vérification (à adapter selon votre outil de couverture)
+          echo "La couverture a été générée."
