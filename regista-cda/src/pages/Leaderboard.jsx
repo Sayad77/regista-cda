@@ -5,48 +5,55 @@ function Leaderboard() {
   const [players, setPlayers] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:4000/api/classement')
+    fetch('http://localhost:4000/api/game/classement')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
-            setPlayers(data);
+          setPlayers(data);
         }
       })
       .catch(err => console.error("Erreur de connexion au serveur :", err));
   }, []);
 
   return (
-    <div>
+    <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh', color: '#fff', fontFamily: 'sans-serif' }}>
       <Navbar />
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <h1>🏆 Classement Regista</h1>
+      <div style={{ padding: '3rem 2rem', maxWidth: '1000px', margin: '0 auto' }}>
         
-        <table style={{ margin: '0 auto', width: '80%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ backgroundColor: '#1a1a1a', borderBottom: '2px solid #00D1B2', color: 'white' }}>
-              <th style={{ padding: '10px' }}>Position</th>
-              <th style={{ padding: '10px' }}>Pseudo</th>
-              <th style={{ padding: '10px' }}>Cartes collectionnées</th>
-              <th style={{ padding: '10px' }}>Solde</th>
-            </tr>
-          </thead>
-          <tbody>
-            {players.length > 0 ? (
-              players.map((player, index) => (
-                <tr key={player.id} style={{ borderBottom: '1px solid #333' }}>
-                  <td style={{ padding: '10px' }}>{index + 1}</td>
-                  <td style={{ padding: '10px', fontWeight: 'bold' }}>{player.pseudo}</td>
-                  <td style={{ padding: '10px' }}>{player.cartes}</td>
-                  <td style={{ padding: '10px', color: '#00D1B2' }}>{player.solde} €</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" style={{ padding: '20px' }}>Chargement des joueurs...</td>
+        <h1 style={{ color: '#d4af37', fontSize: '2.2rem', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '3px', marginBottom: '40px' }}>
+          🏆 Classement Regista
+        </h1>
+        
+        <div style={{ background: '#111', border: '1px solid #222', borderRadius: '12px', padding: '25px', boxShadow: '0 10px 30px rgba(0,0,0,0.7)' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead>
+              <tr style={{ borderBottom: '2px solid #00D1B2', color: '#00D1B2', fontSize: '1.1rem' }}>
+                <th style={{ padding: '15px' }}>Position</th>
+                <th style={{ padding: '15px' }}>Pseudo</th>
+                <th style={{ padding: '15px' }}>Solde</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {players.length > 0 ? (
+                players.map((player, index) => (
+                  <tr key={index} style={{ borderBottom: '1px solid #222' }}>
+                    <td style={{ padding: '15px', fontWeight: 'bold', color: index === 0 ? '#d4af37' : '#fff' }}>
+                      {index + 1} {index === 0 && '👑'}
+                    </td>
+                    <td style={{ padding: '15px', fontWeight: 'bold' }}>{player.pseudo || player.username}</td>
+                    <td style={{ padding: '15px', fontWeight: 'bold', color: '#00D1B2' }}>{player.solde} 🎫</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" style={{ padding: '30px', textAlign: 'center', color: '#888' }}>
+                    Aucun agent enregistré.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
