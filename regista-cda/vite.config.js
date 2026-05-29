@@ -1,13 +1,23 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vitest/config'; // Importation depuis vitest pour la compatibilité
+import react from '@vitejs/plugin-react';
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  // 🧪 AJOUTEZ CE BLOC DE CONFIGURATION POUR LES TESTS
   test: {
-    globals: true,             // 1. Active afterAll, describe, expect sans avoir à les importer
-    environment: 'jsdom',      // 2. Simule un navigateur internet pour React
-    include: ['src/**/*.{test,spec}.{js,jsx}'] // 3. 🎯 FORCE Vitest à ne chercher que dans le Front-end !
+    globals: true, 
+    environment: 'jsdom',
+    include: ['src/**/*.{test,spec}.{js,jsx}'],
+    // 🎯 CONFIGURATION DE LA COUVERTURE (Code Coverage)
+    coverage: {
+      provider: 'v8', // Utilise V8 pour une analyse rapide et précise
+      reporter: ['text', 'json', 'html'], // Génère les rapports nécessaires
+      thresholds: {
+        // Si vous passez en dessous de ces 80%, le test échouera !
+        lines: 80,
+        functions: 80,
+        branches: 80,
+        statements: 80,
+      },
+    },
   },
-})
+});
