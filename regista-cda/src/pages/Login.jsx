@@ -1,12 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import Navbar from '../components/Navbar';
 
 function Login() {
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [form, setForm] = useState({ pseudo: '', email: '', password: '' });
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  // 🧹 NETTOYAGE CHIRURGICAL : Dès qu'on arrive sur la page de connexion, on détruit l'ancienne session
+  // Mais ON GARDE INTENTIOENNELLEMENT regista_solde et regista_collection pour ne pas perdre l'argent et les cartes !
+  useEffect(() => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('pseudo');
+    localStorage.removeItem('username');
+  }, []);
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -25,7 +32,6 @@ function Login() {
         body: JSON.stringify(payload)
       });
       
-      // On sécurise la lecture du JSON
       let data;
       try {
           data = await response.json();
@@ -35,19 +41,19 @@ function Login() {
       }
       
       if (response.ok || data.success) {
-        localStorage.setItem('username', form.pseudo);
-        // CORRECTION MAJEURE : data.token et non response.data.token
+        // 🎯 On stocke les identifiants avec les bonnes clés pour que la Navbar et le Backend nous reconnaissent
+        localStorage.setItem('pseudo', form.pseudo);
+        localStorage.setItem('username', form.pseudo); 
         localStorage.setItem('token', data.token); 
+        
         navigate('/home');
       } else {
         setError(data.error || data.message || "Erreur d'authentification");
       }
     } catch (err) { 
-      // On affiche la vraie erreur dans la console F12 pour comprendre
       console.error("🚨 Vraie erreur capturée :", err);
-      
       if (err.message === "Failed to fetch") {
-          setError("Impossible de joindre le serveur. (Problème de CORS ou port 4000 éteint).");
+          setError("Impossible de joindre le serveur. (Vérifiez que Docker est allumé sur le port 4000).");
       } else {
           setError(err.message || "Une erreur inconnue s'est produite.");
       }
@@ -56,8 +62,9 @@ function Login() {
 
   return (
     <div style={containerStyle}>
-      <Navbar />
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+      {/* ⚠️ La Navbar n'est pas importée ici, elle ne s'affichera donc jamais sur la page de connexion */}
+      
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
         <div style={cardStyle}>
           <h1 style={{color: '#00D1B2', margin: '0 0 10px 0', fontSize: '2.5rem', letterSpacing: '3px'}}>REGISTA</h1>
           <p style={{color: '#888', marginBottom: '30px', fontSize: '1.1rem'}}>
