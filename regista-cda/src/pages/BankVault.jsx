@@ -2,27 +2,22 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import PlayerCard from '../components/PlayerCard';
-// 📦 Importation des icônes professionnelles
-import { FaUniversity, FaTicketAlt, FaUnlock, FaTrashAlt, FaExclamationTriangle } from 'react-icons/fa';
-import { BsSafe } from 'react-icons/bs';
+// 📦 Importation des icônes colorées (Flat Color)
+import { FcLibrary, FcMoneyTransfer, FcSafe, FcUnlock, FcLock, FcFullTrash, FcHighPriority } from 'react-icons/fc';
 
 function BankVault({ solde, transactions, myCollection }) {
   const [isVaultOpen, setIsVaultOpen] = useState(false);
-  // 🧨 NOUVEL ÉTAT : Contrôle l'affichage de la modale de suppression
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const navigate = useNavigate();
 
-  // Fonction 1 : Déclenchée par le bouton rouge en bas (Ouvre la modale)
   const handleDeleteClick = () => {
     setShowDeleteModal(true);
   };
 
-  // Fonction 2 : Déclenchée par le bouton "Annuler" de la modale (Ferme la modale)
   const handleCancelDelete = () => {
     setShowDeleteModal(false);
   };
 
-  // Fonction 3 : Déclenchée par le bouton "CONFIRMER" de la modale (Détruit le compte)
   const confirmDeletion = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -63,8 +58,8 @@ function BankVault({ solde, transactions, myCollection }) {
           {/* LEDGER BANCAIRE */}
           <div style={{ flex: '1 1 400px', background: '#0a0a0c', border: '1px solid #333', borderRadius: '12px', padding: '20px' }}>
             <h2 style={{ color: '#00ffcc', margin: '0 0 20px 0', fontSize: '1.2rem', borderBottom: '1px solid #222', paddingBottom: '10px', display: 'flex', alignItems: 'center' }}>
-              <FaUniversity style={{ marginRight: '10px' }} /> 
-              HISTORIQUE BANCAIRE (Solde: {solde} <FaTicketAlt style={{ marginLeft: '6px', fontSize: '1rem' }} />)
+              <FcLibrary style={{ marginRight: '10px', fontSize: '1.5rem' }} /> 
+              HISTORIQUE BANCAIRE (Solde: {solde} <FcMoneyTransfer style={{ marginLeft: '6px', fontSize: '1.4rem' }} />)
             </h2>
             
             <div style={{ maxHeight: '600px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', paddingRight: '10px' }}>
@@ -78,7 +73,7 @@ function BankVault({ solde, transactions, myCollection }) {
                       <span style={{ color: '#888', fontSize: '0.8rem' }}>{t.time}</span>
                     </div>
                     <strong style={{ color: t.montant > 0 ? '#00ffcc' : '#ff4444', fontSize: '1.1rem', alignSelf: 'center', display: 'flex', alignItems: 'center' }}>
-                      {t.montant > 0 ? `+${t.montant}` : t.montant} <FaTicketAlt style={{ marginLeft: '6px', fontSize: '0.9rem' }} />
+                      {t.montant > 0 ? `+${t.montant}` : t.montant} <FcMoneyTransfer style={{ marginLeft: '6px', fontSize: '1.2rem' }} />
                     </strong>
                   </div>
                 ))
@@ -89,7 +84,7 @@ function BankVault({ solde, transactions, myCollection }) {
           {/* COFFRE-FORT */}
           <div style={{ flex: '2 1 500px', background: '#111', border: '1px solid #333', borderRadius: '12px', padding: '20px', textAlign: 'center', minHeight: '300px', display: 'flex', flexDirection: 'column', justifyContent: isVaultOpen ? 'flex-start' : 'center' }}>
             <h2 style={{ color: '#d4af37', margin: '0 0 20px 0', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <BsSafe style={{ marginRight: '10px', fontSize: '1.4rem' }} /> VOTRE COFFRE-FORT ({myCollection.length} Cartes)
+              <FcSafe style={{ marginRight: '10px', fontSize: '1.6rem' }} /> VOTRE COFFRE-FORT ({myCollection.length} Cartes)
             </h2>
             
             {!isVaultOpen ? (
@@ -97,15 +92,15 @@ function BankVault({ solde, transactions, myCollection }) {
                 onClick={() => setIsVaultOpen(true)}
                 style={{ background: '#222', border: '1px solid #d4af37', color: '#d4af37', padding: '15px 30px', borderRadius: '8px', cursor: 'pointer', fontSize: '1.1rem', alignSelf: 'center', display: 'flex', alignItems: 'center', gap: '10px' }}
                >
-                 <FaUnlock /> DÉVERROUILLER LE COFFRE
+                 <FcUnlock style={{ fontSize: '1.4rem' }} /> DÉVERROUILLER LE COFFRE
                </button>
             ) : (
                <div>
                   <button 
                     onClick={() => setIsVaultOpen(false)}
-                    style={{ background: 'transparent', border: 'none', color: '#ff4444', cursor: 'pointer', marginBottom: '20px', textDecoration: 'underline', fontWeight: 'bold' }}
+                    style={{ background: 'transparent', border: 'none', color: '#ff4444', cursor: 'pointer', marginBottom: '20px', textDecoration: 'underline', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', gap: '8px' }}
                   >
-                    Verrouiller le coffre (Sécurité)
+                    <FcLock style={{ fontSize: '1.2rem' }} /> Verrouiller le coffre (Sécurité)
                   </button>
                   <div className="cards-grid">
                     {myCollection.map(player => (
@@ -121,7 +116,7 @@ function BankVault({ solde, transactions, myCollection }) {
           </div>
         </section>
 
-        {/* ⚖️ Zone de Danger RGPD (Droit à l'oubli) */}
+        {/* ⚖️ Zone de Danger RGPD */}
         <div style={{ marginTop: '4rem', paddingTop: '2rem', borderTop: '1px solid #333', textAlign: 'center' }}>
           <h3 style={{ color: '#ff4444', marginBottom: '10px' }}>Zone de Danger (RGPD)</h3>
           <p style={{ color: '#888', fontSize: '0.9rem', marginBottom: '20px' }}>
@@ -146,7 +141,7 @@ function BankVault({ solde, transactions, myCollection }) {
             onMouseEnter={(e) => { e.target.style.background = '#ff4444'; e.target.style.color = 'white'; }}
             onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.color = '#ff4444'; }}
           >
-            <FaTrashAlt /> SUPPRIMER MON COMPTE DÉFINITIVEMENT
+            <FcFullTrash style={{ fontSize: '1.3rem' }} /> SUPPRIMER MON COMPTE DÉFINITIVEMENT
           </button>
         </div>
 
@@ -166,7 +161,7 @@ function BankVault({ solde, transactions, myCollection }) {
             boxShadow: '0 10px 40px rgba(255, 68, 68, 0.2)'
           }}>
             <h2 style={{ color: '#ff4444', fontSize: '1.8rem', marginTop: 0, textTransform: 'uppercase', letterSpacing: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-              <FaExclamationTriangle /> Alerte de Sécurité
+              <FcHighPriority style={{ fontSize: '2rem' }} /> Alerte de Sécurité
             </h2>
             <p style={{ color: '#ccc', fontSize: '1.1rem', lineHeight: '1.6', marginBottom: '30px' }}>
               Êtes-vous absolument certain de vouloir supprimer définitivement votre compte ?<br /><br />

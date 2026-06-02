@@ -1,20 +1,19 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { FaSearch, FaBuilding, FaUniversity, FaTrophy, FaCog, FaHome } from 'react-icons/fa';
+// 📦 Importation des icônes colorées (Flat Color)
+import { FcHome, FcSearch, FcOrganization, FcLibrary, FcIcons8Cup, FcSettings } from 'react-icons/fc';
 
 export default function Navbar() {
   const navigate = useNavigate();
-  // On récupère le pseudo (soit 'pseudo', soit 'username' selon votre configuration)
   const currentAgent = localStorage.getItem('pseudo') || localStorage.getItem('username');
 
   // 🛡️ ACCÈS ADMIN : Le bouton s'affiche UNIQUEMENT pour Dildi_President
   const isAuthorizedAdmin = currentAgent === 'Dildi_President';
 
   const handleLogout = () => {
-    localStorage.clear(); // Purge absolue
+    localStorage.clear();
     navigate('/');
   };
 
-  // Ajout du flex pour un alignement vertical parfait icône + texte
   const linkStyle = { 
     color: '#fff', 
     textDecoration: 'none', 
@@ -34,25 +33,25 @@ export default function Navbar() {
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
         <Link to="/home" style={linkStyle}>
-          <FaHome style={{ marginRight: '8px' }} /> Accueil
+          <FcHome style={{ marginRight: '8px', fontSize: '1.2rem' }} /> Accueil
         </Link>
         <Link to="/scoutisme" style={linkStyle}>
-          <FaSearch style={{ marginRight: '8px' }} /> Scoutisme
+          <FcSearch style={{ marginRight: '8px', fontSize: '1.2rem' }} /> Scoutisme
         </Link>
         <Link to="/agence" style={linkStyle}>
-          <FaBuilding style={{ marginRight: '8px' }} /> Agence
+          <FcOrganization style={{ marginRight: '8px', fontSize: '1.2rem' }} /> Agence
         </Link>
         <Link to="/banque" style={linkStyle}>
-          <FaUniversity style={{ marginRight: '8px' }} /> Banque
+          <FcLibrary style={{ marginRight: '8px', fontSize: '1.2rem' }} /> Banque
         </Link>
         <Link to="/classement" style={linkStyle}>
-          <FaTrophy style={{ marginRight: '8px' }} /> Classement
+          <FcIcons8Cup style={{ marginRight: '8px', fontSize: '1.2rem' }} /> Classement
         </Link>
         
-        {/* ⚙️ BOUTON ADMIN NETTOYÉ ET SÉCURISÉ */}
+        {/* ⚙️ BOUTON ADMIN */}
         {isAuthorizedAdmin && (
           <Link to="/admin" style={{ ...linkStyle, color: '#ff4444', fontWeight: 'bold', border: '1px solid #ff4444', padding: '5px 10px', borderRadius: '6px' }}>
-            <FaCog style={{ marginRight: '8px' }} /> Admin
+            <FcSettings style={{ marginRight: '8px', fontSize: '1.2rem' }} /> Admin
           </Link>
         )}
 
