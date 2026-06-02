@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import PlayerCard from '../components/PlayerCard';
+// 📦 Importation des icônes professionnelles
+import { FaUniversity, FaTicketAlt, FaUnlock, FaTrashAlt, FaExclamationTriangle } from 'react-icons/fa';
+import { BsSafe } from 'react-icons/bs';
 
 function BankVault({ solde, transactions, myCollection }) {
   const [isVaultOpen, setIsVaultOpen] = useState(false);
@@ -59,8 +62,9 @@ function BankVault({ solde, transactions, myCollection }) {
           
           {/* LEDGER BANCAIRE */}
           <div style={{ flex: '1 1 400px', background: '#0a0a0c', border: '1px solid #333', borderRadius: '12px', padding: '20px' }}>
-            <h2 style={{ color: '#00ffcc', margin: '0 0 20px 0', fontSize: '1.2rem', borderBottom: '1px solid #222', paddingBottom: '10px' }}>
-              🏦 HISTORIQUE BANCAIRE (Solde: {solde} 🎫)
+            <h2 style={{ color: '#00ffcc', margin: '0 0 20px 0', fontSize: '1.2rem', borderBottom: '1px solid #222', paddingBottom: '10px', display: 'flex', alignItems: 'center' }}>
+              <FaUniversity style={{ marginRight: '10px' }} /> 
+              HISTORIQUE BANCAIRE (Solde: {solde} <FaTicketAlt style={{ marginLeft: '6px', fontSize: '1rem' }} />)
             </h2>
             
             <div style={{ maxHeight: '600px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', paddingRight: '10px' }}>
@@ -73,8 +77,8 @@ function BankVault({ solde, transactions, myCollection }) {
                       <span style={{ color: '#fff', fontSize: '0.95rem', fontWeight: 'bold' }}>{t.motif}</span>
                       <span style={{ color: '#888', fontSize: '0.8rem' }}>{t.time}</span>
                     </div>
-                    <strong style={{ color: t.montant > 0 ? '#00ffcc' : '#ff4444', fontSize: '1.1rem', alignSelf: 'center' }}>
-                      {t.montant > 0 ? `+${t.montant}` : t.montant} 🎫
+                    <strong style={{ color: t.montant > 0 ? '#00ffcc' : '#ff4444', fontSize: '1.1rem', alignSelf: 'center', display: 'flex', alignItems: 'center' }}>
+                      {t.montant > 0 ? `+${t.montant}` : t.montant} <FaTicketAlt style={{ marginLeft: '6px', fontSize: '0.9rem' }} />
                     </strong>
                   </div>
                 ))
@@ -84,16 +88,16 @@ function BankVault({ solde, transactions, myCollection }) {
 
           {/* COFFRE-FORT */}
           <div style={{ flex: '2 1 500px', background: '#111', border: '1px solid #333', borderRadius: '12px', padding: '20px', textAlign: 'center', minHeight: '300px', display: 'flex', flexDirection: 'column', justifyContent: isVaultOpen ? 'flex-start' : 'center' }}>
-            <h2 style={{ color: '#d4af37', margin: '0 0 20px 0', fontSize: '1.2rem' }}>
-              🗄️ VOTRE COFFRE-FORT ({myCollection.length} Cartes)
+            <h2 style={{ color: '#d4af37', margin: '0 0 20px 0', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <BsSafe style={{ marginRight: '10px', fontSize: '1.4rem' }} /> VOTRE COFFRE-FORT ({myCollection.length} Cartes)
             </h2>
             
             {!isVaultOpen ? (
                <button 
                 onClick={() => setIsVaultOpen(true)}
-                style={{ background: '#222', border: '1px solid #d4af37', color: '#d4af37', padding: '15px 30px', borderRadius: '8px', cursor: 'pointer', fontSize: '1.1rem', alignSelf: 'center' }}
+                style={{ background: '#222', border: '1px solid #d4af37', color: '#d4af37', padding: '15px 30px', borderRadius: '8px', cursor: 'pointer', fontSize: '1.1rem', alignSelf: 'center', display: 'flex', alignItems: 'center', gap: '10px' }}
                >
-                 🔓 DÉVERROUILLER LE COFFRE
+                 <FaUnlock /> DÉVERROUILLER LE COFFRE
                </button>
             ) : (
                <div>
@@ -133,12 +137,16 @@ function BankVault({ solde, transactions, myCollection }) {
               borderRadius: '6px', 
               cursor: 'pointer', 
               fontWeight: 'bold',
-              transition: 'all 0.3s'
+              transition: 'all 0.3s',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px'
             }}
             onMouseEnter={(e) => { e.target.style.background = '#ff4444'; e.target.style.color = 'white'; }}
             onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.color = '#ff4444'; }}
           >
-            🗑️ SUPPRIMER MON COMPTE DÉFINITIVEMENT
+            <FaTrashAlt /> SUPPRIMER MON COMPTE DÉFINITIVEMENT
           </button>
         </div>
 
@@ -157,8 +165,8 @@ function BankVault({ solde, transactions, myCollection }) {
             padding: '40px', maxWidth: '500px', width: '90%', textAlign: 'center',
             boxShadow: '0 10px 40px rgba(255, 68, 68, 0.2)'
           }}>
-            <h2 style={{ color: '#ff4444', fontSize: '1.8rem', marginTop: 0, textTransform: 'uppercase', letterSpacing: '2px' }}>
-              ⚠️ Alerte de Sécurité
+            <h2 style={{ color: '#ff4444', fontSize: '1.8rem', marginTop: 0, textTransform: 'uppercase', letterSpacing: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+              <FaExclamationTriangle /> Alerte de Sécurité
             </h2>
             <p style={{ color: '#ccc', fontSize: '1.1rem', lineHeight: '1.6', marginBottom: '30px' }}>
               Êtes-vous absolument certain de vouloir supprimer définitivement votre compte ?<br /><br />
