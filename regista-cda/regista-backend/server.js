@@ -14,6 +14,7 @@ const gameRoutes = require('./routes/gameRoutes');
 const marketRoutes = require('./routes/marketRoutes');
 const cardsRoutes = require('./routes/cardsRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+
 app.use(cors());
 app.use(express.json());
 
