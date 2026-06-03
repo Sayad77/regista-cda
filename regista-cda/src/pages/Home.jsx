@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar'; // 👈 1. IMPORT DE LA NAVBAR RESTAURÉ
+import Navbar from '../components/Navbar';
+// 📦 Importation des icônes colorées (Flat Color)
+import { FcOrganization, FcLibrary } from 'react-icons/fc';
 
 function Home() {
   const navigate = useNavigate();
@@ -14,7 +16,6 @@ function Home() {
 
   return (
     <div className="app-container">
-      {/* 👈 2. AFFICHAGE DE LA NAVBAR POUR ACCÉDER À LA BANQUE, AGENCE, ETC. */}
       <Navbar /> 
       
       <main style={{ padding: '4rem 2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -34,11 +35,17 @@ function Home() {
             <li style={{ marginBottom: '20px' }}>
               <strong style={{ color: 'white' }}>• LE GRADE :</strong> Moins vous faites d'erreurs et utilisez d'indices, plus la qualité de votre carte sera élevée (Rang S, A, B, C, D).
             </li>
-            <li style={{ marginBottom: '20px' }}>
-              <strong style={{ color: 'white' }}>• L'AGENCE ONAIRTECH 🏢 :</strong> Vous n'avez plus de billets ? Revendez vos cartes à l'Agence. Une carte Rang S vaut très cher !
+            <li style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+              <strong style={{ color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                • L'AGENCE ONAIRTECH <FcOrganization style={{ fontSize: '1.4rem' }} /> :
+              </strong> 
+              &nbsp;Vous n'avez plus de billets ? Revendez vos cartes à l'Agence. Une carte Rang S vaut très cher !
             </li>
-            <li style={{ marginBottom: '20px' }}>
-              <strong style={{ color: 'white' }}>• LA BANQUE 🏦 :</strong> Consultez votre historique de transactions et admirez les cartes stockées dans votre coffre-fort.
+            <li style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+              <strong style={{ color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                • LA BANQUE <FcLibrary style={{ fontSize: '1.4rem' }} /> :
+              </strong> 
+              &nbsp;Consultez votre historique de transactions et admirez les cartes stockées dans votre coffre-fort.
             </li>
           </ul>
 
@@ -61,7 +68,6 @@ function Home() {
           </div>
 
           <div style={{ textAlign: 'center', marginTop: '30px' }}>
-            {/* 👈 3. CORRECTION DU LIEN VERS SCOUTISME */}
             <Link to="/scoutisme" style={{ 
               display: 'inline-block', background: 'linear-gradient(45deg, #d4af37, #f0c641)', 
               color: '#000', padding: '15px 40px', borderRadius: '8px', fontSize: '1.3rem', 
