@@ -14,8 +14,12 @@ jobs:
         with:
           node-version: '20'
 
+      # On dit au robot d'entrer d'abord dans regista-cda, PUIS dans regista-backend
       - name: Install dependencies
+        working-directory: ./regista-cda/regista-backend
         run: npm install
 
+      # Pareil pour les tests !
       - name: Run Tests with Coverage
+        working-directory: ./regista-cda/regista-backend
         run: npm run test:coverage
