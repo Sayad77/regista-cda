@@ -1,46 +1,55 @@
-// 🎯 INJECTION PRIORITAIRE : On configure l'environnement de test en dur pour Jest
-// Cela court-circuite les caprices de dotenvx et isole parfaitement le plan de test.
-process.env.NODE_ENV = 'test';
-process.env.DB_HOST = '127.0.0.1';   // On cible le Docker qui tourne sur votre Windows
-process.env.DB_USER = 'root';        // Votre utilisateur MySQL
-process.env.DB_PASSWORD = '';        // Votre mot de passe (vide)
-process.env.DB_NAME = 'regista_db';  // Le nom de votre base de données
-process.env.PORT = '4000';
-
 const request = require('supertest');
-const app = require('../server'); 
-const dbPool = require('../config/db'); 
+const express = require('express');
+const authRoutes = require('../routes/authRoutes');
 
-describe('🔒 Tests d\'intégration - Authentification Backend', () => {
+// 🏆 LE SECRET CDA : On "MOCK" (simule) la base de données !
+// Le vrai fichier db.js ne sera jamais exécuté pendant les tests.
+jest.mock('../config/db', () => {
+    return {
+        query: jest.fn(), // On crée une fausse fonction query
+        end: jest.fn()    // On crée une fausse fonction end
+    };
+});
 
-    // 🛡️ Fermeture propre du pool après les tests
-    afterAll(async () => {
-        if (dbPool && typeof dbPool.end === 'function') {
-            await dbPool.end();
-        }
+const dbPool = require('../config/db'); // Ceci est maintenant notre fausse base de données
+
+// Fausse application pour le test
+const app = express();
+app.use(express.json());
+app.use('/api/users', authRoutes); 
+
+describe('🧪 Tests de la Classe AuthController', () => {
+
+    // On nettoie les fausses données entre chaque test
+    beforeEach(() => {
+        jest.clearAllMocks();
     });
 
-    it('devrait refuser l\'accès si un agent tente de se connecter avec des champs vides', async () => {
+    // Test n°1 (Passe directement car il plante avant la BDD)
+    it('Devrait refuser une inscription si le mot de passe est manquant', async () => {
         const res = await request(app)
-            .post('/api/login') 
-            .send({
-                pseudo: '',
-                password: ''
-            });
+            .post('/api/users/register')
+            .send({ pseudo: 'Agent_Test' });
 
-        expect(res.statusCode).toBe(401);
+        expect(res.statusCode).toEqual(400);
         expect(res.body).toHaveProperty('error');
     });
 
-    it('devrait renvoyer une erreur si le pseudo de l\'agent n\'existe pas', async () => {
+    // Test n°2 (On force la fausse BDD à dire "Je n'ai pas trouvé l'utilisateur")
+    it('Devrait refuser la connexion avec un mauvais pseudo', async () => {
+        
+        // On ordonne à notre fausse base de données de renvoyer un tableau vide
+        dbPool.query.mockResolvedValueOnce([[]]); 
+
         const res = await request(app)
-            .post('/api/login') 
+            .post('/api/users/login')
             .send({
-                pseudo: 'Agent_Fantome_9999',
+                pseudo: 'Agent_Fantome',
                 password: 'password123'
             });
 
-        expect(res.statusCode).toBe(401);
-        expect(res.body.error).toBe('Pseudo introuvable');
+        expect(res.statusCode).toEqual(401);
+        expect(res.body).toHaveProperty('error', 'Pseudo introuvable');
     });
+
 });
