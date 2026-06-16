@@ -22,7 +22,8 @@ function BankVault({ solde, transactions, myCollection }) {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await fetch('http://localhost:4000/api/users/delete', {
+      // Modification ici pour Render / Local automatique
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/users/delete`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

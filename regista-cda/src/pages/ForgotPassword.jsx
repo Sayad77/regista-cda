@@ -17,7 +17,8 @@ function ForgotPassword() {
         setSuccessMsg('');
 
         try {
-            const res = await fetch('http://localhost:4000/api/forgot-password', {
+            // Modification ici pour Render / Local automatique
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/forgot-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: form.email, pseudo: form.pseudo })
@@ -41,7 +42,8 @@ function ForgotPassword() {
         setErrorMsg('');
 
         try {
-            const res = await fetch('http://localhost:4000/api/reset-password', {
+            // Modification ici pour Render / Local automatique
+            const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/reset-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(form)

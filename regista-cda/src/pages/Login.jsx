@@ -19,7 +19,9 @@ function Login() {
     e.preventDefault();
     setError('');
 
-    const endpoint = isLoginMode ? 'http://localhost:4000/api/login' : 'http://localhost:4000/api/register';
+    // Configuration dynamique de l'URL pour Render ou le Local
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+    const endpoint = isLoginMode ? `${baseUrl}/api/login` : `${baseUrl}/api/register`;
     
     const payload = isLoginMode 
         ? { pseudo: form.pseudo, password: form.password } 
@@ -53,7 +55,7 @@ function Login() {
     } catch (err) { 
       console.error("🚨 Vraie erreur capturée :", err);
       if (err.message === "Failed to fetch") {
-          setError("Impossible de joindre le serveur. (Vérifiez que Docker est allumé sur le port 4000).");
+          setError("Impossible de joindre le serveur. (Vérifiez que le backend en ligne est réveillé ou que Docker est allumé sur le port 4000).");
       } else {
           setError(err.message || "Une erreur inconnue s'est produite.");
       }

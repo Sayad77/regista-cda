@@ -62,7 +62,8 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
     
     const token = localStorage.getItem('token');
 
-    fetch(`http://localhost:4000/api/game/start/${selectedTeam}`, {
+    // Modification ici pour Render / Local automatique
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/game/start/${selectedTeam}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -121,7 +122,8 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
           const token = localStorage.getItem('token');
           console.log("DEBUG - finalRank calculé avant fetch :", finalRank);
           
-          const response = await fetch(`http://localhost:4000/api/cards/draw/${finalRank}`, {
+          // Modification ici pour Render / Local automatique
+          const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/cards/draw/${finalRank}`, {
               headers: { 'Authorization': `Bearer ${token}` }
           });
           
@@ -179,7 +181,8 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
     } else {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:4000/api/cards/draw/D`, {
+        // Modification ici pour Render / Local automatique
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/cards/draw/D`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         

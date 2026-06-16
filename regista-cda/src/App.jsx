@@ -58,7 +58,9 @@ function App() {
       setMyCollection(prev => prev.filter(p => p.id !== playerId));
 
       const storedUser = localStorage.getItem('pseudo') || "Joueur_Test";
-      fetch('http://localhost:4000/api/market/sell', {
+      
+      // Modification ici pour Render / Local automatique
+      fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/market/sell`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username: storedUser, cardId: playerId, price: sellPrice })

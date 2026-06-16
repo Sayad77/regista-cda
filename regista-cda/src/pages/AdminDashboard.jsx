@@ -29,7 +29,9 @@ export default function AdminDashboard() {
 
   const fetchLitigations = (token) => {
     const activeToken = token || localStorage.getItem('token');
-    fetch('http://localhost:4000/api/admin/litigations', {
+    
+    // Modification ici pour Render / Local automatique
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/admin/litigations`, {
         headers: {
             'Authorization': `Bearer ${activeToken}`,
             'Content-Type': 'application/json'
@@ -49,7 +51,8 @@ export default function AdminDashboard() {
     e.preventDefault();
     const token = localStorage.getItem('token');
     
-    fetch('http://localhost:4000/api/admin/players', {
+    // Modification ici pour Render / Local automatique
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/admin/players`, {
       method: 'POST',
       headers: { 
         'Authorization': `Bearer ${token}`,
@@ -68,7 +71,8 @@ export default function AdminDashboard() {
   const handleResolve = (id) => {
     const token = localStorage.getItem('token');
     
-    fetch(`http://localhost:4000/api/admin/litigations/${id}/resolve`, { 
+    // Modification ici pour Render / Local automatique
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/admin/litigations/${id}/resolve`, { 
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` }
     })

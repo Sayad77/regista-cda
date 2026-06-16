@@ -9,7 +9,8 @@ function Leaderboard() {
   const [players, setPlayers] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:4000/api/game/classement')
+    // Modification ici pour Render / Local automatique
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/game/classement`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
