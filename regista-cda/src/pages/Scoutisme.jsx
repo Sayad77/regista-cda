@@ -379,7 +379,7 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
             boxShadow: '0 0 40px rgba(255, 68, 68, 0.3)'
           }}>
             <h3 style={{ color: '#ff4444', margin: '0 0 20px 0', fontSize: '1.8rem', letterSpacing: '2px' }}>
-              👁️ DOSSIER DÉCLASSIFIÉ
+               DOSSIER DÉCLASSIFIÉ
             </h3>
             
             <p style={{ color: '#aaa', fontSize: '1.2rem', marginBottom: '10px' }}>
