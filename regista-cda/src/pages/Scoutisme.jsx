@@ -484,7 +484,7 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
             onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(255, 68, 68, 0.1)'}
             onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
           >
-            👁️ RÉVÉLER LA RÉPONSE (Passer au Rang D)
+             RÉVÉLER LA RÉPONSE (Passer au Rang D)
           </button>
 
         </div>
