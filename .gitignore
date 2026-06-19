@@ -1,2 +1,4 @@
 node_modules
-regista-cda/.env
+.env
+.env.*
+!.env.example
