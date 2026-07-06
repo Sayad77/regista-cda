@@ -21,6 +21,10 @@ Ce projet a été conçu, sécurisé et conteneurisé dans le cadre du passage d
 
 ---
 
+## 🌐 Application en ligne
+* **Frontend :** https://regista-front.onrender.com
+* **Backend (API) :** https://regista-backend-ziv5.onrender.com
+
 ## 🛡️ Architecture de Sécurité (Conformité OWASP & CDA)
 
 L'application intègre des contre-mesures strictes face aux vulnérabilités du web :
@@ -36,12 +40,13 @@ L'application intègre des contre-mesures strictes face aux vulnérabilités du 
 ---
 
 ## 🛠️ Stack Technique & DevOps
-
 * **Frontend :** React.js (Vite), React Router v6, CSS 3.
 * **Backend :** Node.js, Express.js.
 * **Base de Données :** MySQL 8.0 (Persistance ACID).
 * **Conteneurisation :** Docker, Docker Compose (Isolation réseau inter-conteneurs).
-* **Déploiement Cible :** Serveur Cloud VPS Hetzner, Reverse Proxy NGINX.
+* **Déploiement :** Render.com — Frontend en Static Site (CDN), Backend en Web Service Dockerisé.
+* **Base de données :** MySQL managée sur Aiven (connexion chiffrée SSL)
+* **CI/CD :** GitHub Actions (tests automatisés à chaque push).
 
 ---
 
