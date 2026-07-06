@@ -131,6 +131,13 @@
   border-radius: 2px;
 }
 
+/* ── Collapse (regroupe liens + actions, côte à côte en desktop) ── */
+.navbar-collapse {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
 /* ── Responsive (tablette/mobile) ─────────────── */
 @media (max-width: 900px) {
   .navbar {
