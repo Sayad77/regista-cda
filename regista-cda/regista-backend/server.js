@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 require('dotenv').config();
 
 // Importation du pool de connexion pour le monitoring
@@ -15,6 +16,8 @@ const marketRoutes = require('./routes/marketRoutes');
 const cardsRoutes = require('./routes/cardsRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
+// 🛡️ Helmet doit être déclaré AVANT toutes les routes pour protéger l'ensemble de l'API
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
@@ -39,10 +42,10 @@ app.use('/api/market', marketRoutes);
 app.use('/api/cards', cardsRoutes);
 app.use('/api/admin', adminRoutes);
 
-// 🎯 SÉCURITÉ POUR JEST : On lance le serveur réseau UNIQUEMENT si on n'est PAS en mode test
+// SÉCURITÉ POUR JEST  réseau UNIQUEMENT si on n'est PAS en mode test
 if (process.env.NODE_ENV !== 'test') {
     app.listen(port, () => console.log(`🚀 Serveur OnAirTech démarré sur le port ${port}`));
 }
 
-// 🎯 INDISPENSABLE POUR SUPERTEST : On exporte l'application Express pour que le robot puisse l'analyser
+// l'application Express pour que le robot puisse l'analyser
 module.exports = app;

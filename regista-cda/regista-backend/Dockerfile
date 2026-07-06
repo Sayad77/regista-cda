@@ -7,8 +7,8 @@ WORKDIR /app
 # On copie les fichiers de configuration npm
 COPY package*.json ./
 
-# On installe les dépendances (express, mysql2, bcrypt, etc.)
-RUN npm install
+# On installe les dépendances (express, mysql2, bcrypt, etc.) de manière déterministe
+ RUN npm ci --omit=dev
 
 # On copie tout le reste du code
 COPY . .

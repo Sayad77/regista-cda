@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
 
         // 2. Récupération et lecture du badge
         const token = req.headers.authorization.split(' ')[1]; // Récupère le token après "Bearer"
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] });
 
         // 3. 🛡️ L'ASTUCE EST ICI : On récupère l'ID, qu'il ait été nommé `userId` ou `id` lors du login !
         const extractedId = decodedToken.userId || decodedToken.id;
@@ -27,7 +27,7 @@ module.exports = (req, res, next) => {
         next(); // Le token est valide, on ouvre la porte !
 
     } catch (error) {
-        console.error("🚨 Erreur Middleware Auth :", error.message);
+        console.error(" Erreur Middleware Auth :", error.message);
         res.status(401).json({ error: 'Requête non authentifiée ! Jeton invalide ou expiré.' });
     }
 };
