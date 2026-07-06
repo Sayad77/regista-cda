@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
 .navbar {
   display: grid;
@@ -8,7 +8,7 @@
   background: #0a0a0a;
   border-bottom: 1px solid rgba(0, 255, 204, 0.15);
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Roboto", sans-serif;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -26,7 +26,7 @@
   font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: 4px;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Roboto", sans-serif;
 }
 
 .badge-beta {
@@ -96,7 +96,7 @@
   padding: 6px 18px;
   border-radius: 5px;
   cursor: pointer;
-  font-family: 'Rajdhani', sans-serif;
+  font-family: "Roboto", sans-serif;
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 1.5px;
@@ -107,4 +107,79 @@
 .btn-logout:hover {
   background: #00ffcc;
   color: #0a0a0a;
+}
+
+/* ── Bouton hamburger (caché en desktop) ─────── */
+.navbar-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 26px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 101;
+}
+
+.navbar-toggle span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background: #00ffcc;
+  border-radius: 2px;
+}
+
+/* ── Responsive (tablette/mobile) ─────────────── */
+@media (max-width: 900px) {
+  .navbar {
+    grid-template-columns: 1fr auto;
+    padding: 0.7rem 1.2rem;
+  }
+
+  .navbar-toggle {
+    display: flex;
+  }
+
+  .navbar-collapse {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    background: #0a0a0a;
+    border-bottom: 1px solid rgba(0, 255, 204, 0.15);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    padding: 0.5rem 0;
+  }
+
+  .navbar-collapse.open {
+    display: flex;
+  }
+
+  .navbar-links,
+  .navbar-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    width: 100%;
+  }
+
+  .nav-link {
+    padding: 14px 20px;
+    border-radius: 0;
+    white-space: normal;
+  }
+
+  .navbar-actions {
+    padding: 10px 20px;
+    gap: 10px;
+  }
+
+  .btn-logout {
+    width: 100%;
+  }
 }
