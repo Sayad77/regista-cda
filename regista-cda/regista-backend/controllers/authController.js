@@ -3,12 +3,12 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 /**
- * 🏗️ CLASSE AUTH CONTROLLER
+ *  CLASSE AUTH CONTROLLER
  * Gère l'authentification, l'inscription et la suppression des agents.
  */
 class AuthController {
     
-    // 🛡️ 1. FONCTION DE CONNEXION
+    //  1. FONCTION DE CONNEXION
     async login(req, res) {
         const { pseudo, password } = req.body;
 
@@ -33,9 +33,15 @@ class AuthController {
             }
 
             // Génération du Token JWT éphémère
+            //  Pas de valeur de secours en clair : si JWT_SECRET est absent, on veut que ça échoue bruyamment
+            // plutôt que de signer avec une clé connue de tous ceux qui lisent le code sur GitHub.
+            if (!process.env.JWT_SECRET) {
+                throw new Error('JWT_SECRET manquant dans la configuration du serveur.');
+            }
+
             const token = jwt.sign(
                 { id: user.id, pseudo: user.pseudo },
-                process.env.JWT_SECRET || 'SECRET_AGENCE_REGINA_2026',
+                process.env.JWT_SECRET,
                 { expiresIn: '1h' }
             );
 
@@ -51,7 +57,7 @@ class AuthController {
         }
     }
 
-    // 🛡️ 2. FONCTION D'INSCRIPTION
+    //  FONCTION D'INSCRIPTION
     async register(req, res) {
         const { pseudo, email, password } = req.body;
 
@@ -82,7 +88,7 @@ class AuthController {
         }
     }
 
-    // 🛡️ 3. FONCTION DE SUPPRESSION
+    //  3. FONCTION DE SUPPRESSION
     async deleteAccount(req, res) {
         try {
             const userId = req.user.id; 
@@ -96,5 +102,5 @@ class AuthController {
     }
 }
 
-// 📦 EXPORT DE L'INSTANCE
+//  EXPORT DE L'INSTANCE
 module.exports = new AuthController();
