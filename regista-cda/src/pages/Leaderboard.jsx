@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
-// 📦 Importation des icônes
+//  Importation des icônes
 import { AiTwotoneTrophy } from 'react-icons/ai';
 import { FcMoneyTransfer } from 'react-icons/fc';
 import { FaCrown } from 'react-icons/fa';

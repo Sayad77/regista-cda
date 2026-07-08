@@ -1,7 +1,7 @@
 const dbPool = require('../config/db');
 
 /**
- * 🏗️ CLASSE GAME CONTROLLER
+ *  CLASSE GAME CONTROLLER
  * Gère le déroulement des parties de scoutisme (récupération des grilles, calcul des scores).
  */
 class GameController {
@@ -104,11 +104,11 @@ class GameController {
             });
 
         } catch (error) {
-            console.error("🚨 ERREUR LORS DE LA SOUMISSION DU JEU :", error);
+            console.error(" ERREUR LORS DE LA SOUMISSION DU JEU :", error);
             res.status(500).json({ error: 'Erreur lors du traitement algorithmique.' });
         }
     }
 }
 
-// 📦 EXPORT DE L'INSTANCE
+//  EXPORT DE L'INSTANCE
 module.exports = new GameController();

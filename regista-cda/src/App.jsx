@@ -98,14 +98,14 @@ function App() {
     <>
       <CookieBanner />
 
-      {/* ⚠️ LA NAVBAR GLOBALE A ÉTÉ SUPPRIMÉE ICI POUR ÉVITER LES DOUBLONS */}
+      {/*  LA NAVBAR GLOBALE A ÉTÉ SUPPRIMÉE ICI POUR ÉVITER LES DOUBLONS */}
 
       <Routes>
-        {/* 🔓 Routes Publiques (SANS NAVBAR) */}
+        {/*  Routes Publiques (SANS NAVBAR) */}
         <Route path="/" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         
-        {/* 🔐 Routes Privées Protégées par le Pare-feu */}
+        {/*  Routes Privées Protégées par le Pare-feu */}
         <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
         <Route path="/scoutisme" element={<PrivateRoute><Scoutisme solde={solde} onBuyHint={handleBuyHint} onWinCard={handleWinCard} /></PrivateRoute>} />
         <Route path="/agence" element={<PrivateRoute><Agency myCollection={myCollection} onSellPlayer={handleSellPlayer} /></PrivateRoute>} />

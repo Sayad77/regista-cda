@@ -13,7 +13,7 @@ const dbPool = mysql.createPool({
     database: process.env.DB_NAME || 'regista_db',
     port: process.env.DB_PORT || 3306,
     ssl: process.env.DB_HOST ? { rejectUnauthorized: false } : null, 
-    multipleStatements: true, // 👈 Permet d'exécuter tout le fichier init.sql d'un coup
+    multipleStatements: true, //  Permet d'exécuter tout le fichier init.sql d'un coup
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0

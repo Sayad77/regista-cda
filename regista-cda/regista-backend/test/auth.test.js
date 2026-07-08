@@ -18,7 +18,7 @@ const app = express();
 app.use(express.json());
 app.use('/api/users', authRoutes); 
 
-describe('🧪 Tests de la Classe AuthController', () => {
+describe('Tests de la Classe AuthController', () => {
 
     // On nettoie les fausses données entre chaque test
     beforeEach(() => {

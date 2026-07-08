@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-// 📦 Importation des icônes colorées (Flat Color)
+//  Importation des icônes colorées (Flat Color)
 import { FcOrganization, FcLibrary } from 'react-icons/fc';
 
 function Home() {

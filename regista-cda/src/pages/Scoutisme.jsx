@@ -129,7 +129,7 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
           
           const jsonResponse = await response.json();
 
-          // 🛡️ LE BARRAGE : Si le serveur refuse (ex: 401 Token invalide), on jette une erreur !
+          //  LE BARRAGE : Si le serveur refuse (ex: 401 Token invalide), on jette une erreur !
           if (!response.ok) {
               throw new Error(jsonResponse.error || "Accès refusé par l'Agence (Token invalide).");
           }
@@ -151,7 +151,7 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
           });
         } catch (error) { 
           console.error("Erreur API :", error);
-          // 🛑 Affiche le vrai message d'erreur envoyé par le barrage
+          //  Affiche le vrai message d'erreur envoyé par le barrage
           setErrorMsg(error.message || "Erreur lors de la communication avec l'Agence.");
         }
       }
@@ -188,7 +188,7 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
         
         const jsonResponse = await response.json();
 
-        // 🛡️ LE BARRAGE : Idem pour la révélation !
+        //  LE BARRAGE : Idem pour la révélation !
         if (!response.ok) {
             throw new Error(jsonResponse.error || "Accès refusé par l'Agence (Token invalide).");
         }
@@ -209,7 +209,7 @@ function Scoutisme({ solde, onBuyHint, onWinCard }) {
         });
       } catch (error) {
         console.error("Erreur API :", error);
-        // 🛑 Affiche le vrai message d'erreur
+        //  Affiche le vrai message d'erreur
         setErrorMsg(error.message || "Erreur lors de la communication avec l'Agence.");
       }
     }

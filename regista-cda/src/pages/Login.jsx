@@ -64,7 +64,7 @@ function Login() {
 
   return (
     <div style={containerStyle}>
-      {/* ⚠️ La Navbar n'est pas importée ici, elle ne s'affichera donc jamais sur la page de connexion */}
+      {/*  La Navbar n'est pas importée ici, elle ne s'affichera donc jamais sur la page de connexion */}
       
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
         <div style={cardStyle}>

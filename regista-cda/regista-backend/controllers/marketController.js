@@ -1,7 +1,7 @@
 const dbPool = require('../config/db');
 
 /**
- * 🏗️ CLASSE MARKETPLACE CONTROLLER
+ *  CLASSE MARKETPLACE CONTROLLER
  * Gère les transactions financières (Achat / Vente) avec le principe ACID.
  */
 class MarketplaceController {
@@ -91,5 +91,5 @@ class MarketplaceController {
     }
 }
 
-// 📦 EXPORT DE L'INSTANCE
+//  EXPORT DE L'INSTANCE
 module.exports = new MarketplaceController();

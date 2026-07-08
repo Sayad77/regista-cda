@@ -42,7 +42,7 @@ export default function Confidentialite() {
           <p style={textStyle}>Nous collectons uniquement les données strictement nécessaires à l'expérience de jeu :</p>
           <ul style={{ color: '#bbb', paddingLeft: '20px', lineHeight: '1.6', fontSize: '0.95rem' }}>
             <li><strong>Pseudonyme & Email :</strong> Pour identifier l'agent et associer son compte.</li>
-            {/* 🛡️ FIX SÉCURITÉ : Suppression du mot "Bcrypt" */}
+            {/*  FIX SÉCURITÉ : Suppression du mot "Bcrypt" */}
             <li><strong>Mot de passe :</strong> Protégé de manière irréversible via un hachage cryptographique fort côté serveur (l'administrateur n'a aucun moyen de connaître votre mot de passe).</li>
             <li><strong>Données de progression :</strong> Solde de tickets (🎫), historique des transferts et contenu du coffre-fort.</li>
           </ul>

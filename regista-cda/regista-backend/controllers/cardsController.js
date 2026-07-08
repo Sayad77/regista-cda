@@ -1,7 +1,7 @@
 const dbPool = require('../config/db');
 
 /**
- * 🏗️ CLASSE CARDS CONTROLLER
+ *  CLASSE CARDS CONTROLLER
  * Gère toute la logique métier (règles) liée aux cartes ADN de l'application.
  */
 class CardsController {

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const dbPool = require('../config/db');
 
-// ⚽ POST /api/admin/players -> Ajouter un nouveau joueur dans la base
+//  POST /api/admin/players -> Ajouter un nouveau joueur dans la base
 router.post('/players', async (req, res) => {
     const { name, grade } = req.body;
     
@@ -19,7 +19,7 @@ router.post('/players', async (req, res) => {
     }
 });
 
-// ⚖️ GET /api/admin/litigations -> Récupérer la liste des litiges de transactions
+//  GET /api/admin/litigations -> Récupérer la liste des litiges de transactions
 router.get('/litigations', async (req, res) => {
     try {
         const [rows] = await dbPool.query('SELECT * FROM litigations ORDER BY id DESC');
@@ -33,7 +33,7 @@ router.get('/litigations', async (req, res) => {
     }
 });
 
-// 🛠️ POST /api/admin/litigations/:id/resolve -> Résoudre un litige actif
+//  POST /api/admin/litigations/:id/resolve -> Résoudre un litige actif
 router.post('/litigations/:id/resolve', async (req, res) => {
     const { id } = req.params;
     try {

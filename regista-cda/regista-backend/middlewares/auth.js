@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
         const token = req.headers.authorization.split(' ')[1]; // Récupère le token après "Bearer"
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] });
 
-        // 3. 🛡️ L'ASTUCE EST ICI : On récupère l'ID, qu'il ait été nommé `userId` ou `id` lors du login !
+        // 3.   On récupère l'ID, qu'il ait été nommé `userId` ou `id` lors du login !
         const extractedId = decodedToken.userId || decodedToken.id;
 
         if (!extractedId) {

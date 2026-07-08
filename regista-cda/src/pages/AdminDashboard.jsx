@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // 👈 Ajout indispensable
+import { useNavigate } from 'react-router-dom'; 
 import Navbar from '../components/Navbar';
 
 export default function AdminDashboard() {
@@ -14,7 +14,7 @@ export default function AdminDashboard() {
     const token = localStorage.getItem('token');
     const pseudo = localStorage.getItem('pseudo');
 
-    // 🛡️ SÉCURITÉ ADMINISTRATEUR SUPRÊME (Double contrôle)
+    //  SÉCURITÉ ADMINISTRATEUR SUPRÊME (Double contrôle)
     if (!token) {
       navigate('/');
       return;
@@ -88,7 +88,7 @@ export default function AdminDashboard() {
       <main style={{ padding: '3rem 2rem', maxWidth: '1100px', margin: '0 auto' }}>
         
         <h1 style={{ color: '#ff4444', fontSize: '2.2rem', textTransform: 'uppercase', letterSpacing: '3px', borderBottom: '1px solid #333', paddingBottom: '15px', marginBottom: '40px' }}>
-          ⚙️ QG de Contrôle - Administration
+           QG de Contrôle - Administration
         </h1>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '30px' }}>

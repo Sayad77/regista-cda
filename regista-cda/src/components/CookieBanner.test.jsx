@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import CookieBanner from './CookieBanner';
 
-describe('🍪 Test Unitaire - CookieBanner', () => {
+describe(' Test Unitaire - CookieBanner', () => {
     beforeEach(() => {
     localStorage.clear();
   });
@@ -59,7 +59,7 @@ describe('🍪 Test Unitaire - CookieBanner', () => {
         // 2. On clique dessus virtuellement
         fireEvent.click(boutonCompris);
         
-        // 3. 🎯 CORRECTION : On vérifie que le bouton n'est PLUS dans le document (il a disparu !)
+        // 3.  CORRECTION : On vérifie que le bouton n'est PLUS dans le document (il a disparu !)
         const boutonApresClic = screen.queryByRole('button', { name: /j'ai compris/i });
         expect(boutonApresClic).not.toBeInTheDocument(); 
     });

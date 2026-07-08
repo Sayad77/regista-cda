@@ -152,7 +152,7 @@ function GameBoard({ mysteryPlayer, onWin, onGiveUp, onBuyClue }) {
             style={{ marginTop: '10px', borderColor: '#ff4444', color: '#ff4444', borderStyle: 'dashed' }} 
             onClick={handleReveal}
           >
-            👁️ Révéler l'identité (Rang D)
+             Révéler l'identité (Rang D)
           </button>
         </div>
       </div>
