@@ -38,7 +38,7 @@ async function importDatabaseTables() {
 }
 
 // Lance l'importation au démarrage du serveur
-importDatabaseTables();
+//importDatabaseTables();//désactivé : évite d'écraser les données de prod à chaque redémarrage
 
 console.log('✅ Pool de base de données Regista initialisé (Sécurisé) !');
 module.exports = dbPool;
