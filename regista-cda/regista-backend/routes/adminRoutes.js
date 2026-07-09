@@ -11,10 +11,15 @@ router.post('/players', async (req, res) => {
     }
 
     try {
-        // Remplacez 'players' par le nom exact de votre table de joueurs si nécessaire
-        await dbPool.query('INSERT INTO players (name, grade) VALUES (?, ?)', [name, grade]);
+        const baseValueByTier = { S: 100000, A: 60000, B: 30000, C: 15000, D: 5000 };
+        const baseValue = baseValueByTier[grade] || 10000;
+        await dbPool.query(
+            'INSERT INTO legendary_cards (name, tier, base_value) VALUES (?, ?, ?)',
+            [name, grade, baseValue]
+        );
         res.status(201).json({ message: `Le joueur ${name} (Rang ${grade}) a été ajouté au catalogue !` });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ error: 'Erreur lors de l\'ajout du joueur en base de données.' });
     }
 });
